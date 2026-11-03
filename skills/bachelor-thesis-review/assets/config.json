@@ -9,5 +9,6 @@
   "claims": "evidence/claims.csv",
   "ai_log": "docs/ai-log.md",
   "record": "docs/gate-record.md",
+  "signoff": "docs/sign-off.md",
   "profile": ".thesis/profile.json"
 }

@@ -41,5 +41,6 @@ Create these in the thesis project, without overwriting existing ones:
 | `.thesis/profile.md`, `.thesis/profile.json` | Step 2 or 3 |
 | `evidence/claims.csv` | `assets/claims.csv` |
 | `docs/ai-log.md` | `assets/ai-log.md` |
+| `docs/sign-off.md` | `assets/sign-off.md` |
 
 In `config.json`, set `scope` to `partial` while chapters are missing and to `full` for the complete thesis.

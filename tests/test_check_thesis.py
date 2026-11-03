@@ -457,6 +457,70 @@ class TypstAndLatexSources(unittest.TestCase):
         self.assertFalse(has(findings, "'Nguyen (2024)'"))
 
 
+class SignOff(unittest.TestCase):
+    HEADER = "| Ngày | Phiên bản | Phạm vi | Mục đích | Người xác nhận |\n|---|---|---|---|---|\n"
+
+    def workspace(self, table=None, scope="partial"):
+        ws = Workspace("# Mở đầu\n\nA\n", scope=scope)
+        self.addCleanup(ws.close)
+        with open(os.path.join(ws.root, ".thesis", "config.json"), encoding="utf-8") as handle:
+            config = json.load(handle)
+        config["signoff"] = "docs/sign-off.md"
+        write(ws.root, ".thesis/config.json", json.dumps(config))
+        if table is not None:
+            write(ws.root, "docs/sign-off.md", self.HEADER + table)
+        return ws
+
+    def git(self, ws, *args):
+        command = ["git", "-C", ws.root, "-c", "user.name=t", "-c", "user.email=t@example.invalid", *args]
+        return subprocess.run(command, capture_output=True, text=True, check=True).stdout.strip()
+
+    def commit(self, ws, message):
+        self.git(ws, "add", "-A")
+        self.git(ws, "commit", "-qm", message)
+        return self.git(ws, "rev-parse", "--short", "HEAD")
+
+    def signoff_findings(self, ws):
+        return [f for f in ws.findings() if f.where == "docs/sign-off.md"]
+
+    def test_config_without_the_key_stays_quiet(self):
+        ws = Workspace("# Mở đầu\n\nA\n")
+        self.addCleanup(ws.close)
+        self.assertFalse(has(ws.findings(), "sign-off"))
+
+    def test_missing_file_is_low_in_a_partial_review(self):
+        self.assertEqual([f.severity for f in self.signoff_findings(self.workspace())], ["low"])
+
+    def test_missing_row_is_medium_for_the_full_thesis(self):
+        self.assertEqual([f.severity for f in self.signoff_findings(self.workspace("", scope="full"))], ["medium"])
+
+    def test_row_without_a_name_does_not_count(self):
+        findings = self.signoff_findings(self.workspace("| 2026-11-03 | abc1234 | Chương 5 | gửi GVHD |  |\n"))
+        self.assertTrue(has(findings, "Chưa có dòng xác nhận"))
+
+    def test_signed_current_version_is_quiet(self):
+        ws = self.workspace()
+        self.git(ws, "init", "-q")
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/sign-off.md", self.HEADER + f"| 2026-11-03 | {version} | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        self.assertEqual(self.signoff_findings(ws), [])
+
+    def test_text_changed_after_signing_is_reported(self):
+        ws = self.workspace()
+        self.git(ws, "init", "-q")
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/sign-off.md", self.HEADER + f"| 2026-11-03 | {version} | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        write(ws.root, ws.source, "# Mở đầu\n\nB\n")
+        self.commit(ws, "second")
+        self.assertTrue(has(self.signoff_findings(ws), "1 commit"))
+
+    def test_unknown_version_is_low(self):
+        ws = self.workspace("| 2026-11-03 | khong-co | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        self.git(ws, "init", "-q")
+        self.commit(ws, "first")
+        self.assertEqual([f.severity for f in self.signoff_findings(ws)], ["low"])
+
+
 @unittest.skipIf(importlib.util.find_spec("pymupdf") is None, "PyMuPDF is not installed")
 class PdfLayout(unittest.TestCase):
     def findings_for(self, left_cm, size):

@@ -10,6 +10,7 @@ Question: is what the thesis states actually true of the work, and can it be tra
 | Results match the data | Open the source for key results. Compare conditions as well as values | `high` |
 | Features exist | Search the code for each described feature | `high` if absent; say "not found in the code provided" |
 | Tests were run | Look for the test, the command, the date and the output | `high` for claimed results with none of these |
+| Sign-off | `medium` if a version is being finalized with no row in `docs/sign-off.md`, or the text changed after the last signed version. Script. A signature only shows the student took responsibility; it does not make the text correct |
 | Unverified claims | Rows with an empty `verified` date, or results the AI generated | `medium`; the student must rerun and confirm |
 | Citations | Number cited against the list; named sources against the list; each cited claim plausibly matches its source | `high` if absent from the list; "not verified" if unchecked |
 | Borrowed material | Figures and tables credited; prose copied without citation | `high` |

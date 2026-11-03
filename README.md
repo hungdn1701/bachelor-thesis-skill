@@ -52,9 +52,9 @@ Ask your agent in plain language, in Vietnamese or English:
 - "Review chapter 5 before I send it to my advisor."
 - "Check my style and format only."
 
-Run the review in a new session, separate from the one that drafted the text.
+Run the review in a new session, separate from the one that drafted the text. Before you merge, send a version to your advisor or finalize it, read the changes and sign `docs/sign-off.md` yourself.
 
-The skills keep their files in your project: `.thesis/` (school, thesis type, language, format basis), `evidence/claims.csv` (each number and its source), `docs/ai-log.md` (where AI contributed) and `docs/gate-record.md` (warnings and your decisions).
+The skills keep their files in your project: `.thesis/` (school, thesis type, language, format basis), `evidence/claims.csv` (each number and its source), `docs/ai-log.md` (where AI contributed), `docs/gate-record.md` (warnings and your decisions) and `docs/sign-off.md` (what you have read and confirmed).
 
 The review runs five gates: honesty, logic, structure, format and style. Gates only warn, and having no warnings is not an approval: decisions belong to your advisor and committee.
 
@@ -65,6 +65,7 @@ The review runs five gates: honesty, logic, structure, format and style. Gates o
 - Report results the AI generated as your own measurements.
 - Help you evade AI detectors, plant errors to look human, or hide AI use.
 - Tell you that your thesis complies with a school rule.
+- Confirm on your behalf, or merge, tag or send a version you have not signed.
 
 ## Thesis types and schools
 

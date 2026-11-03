@@ -343,6 +343,41 @@ def check_ai_log(root, config):
     return []
 
 
+def signed_rows(path):
+    rows = []
+    with open(path, encoding="utf-8", errors="replace") as handle:
+        for line in handle:
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            if line.lstrip().startswith("|") and len(cells) >= 5 and not set(cells[0]) <= {"-", ":", " "}:
+                rows.append(cells)
+    return [row for row in rows[1:] if row[1] and row[-1]]
+
+
+def check_signoff(root, config):
+    """Warns only. A row shows that the student took responsibility, not that the text is right."""
+    rel = config.get("signoff")
+    if not rel:
+        return []
+    severity = "medium" if config.get("scope") == "full" else "low"
+    path = os.path.join(root, rel)
+    rows = signed_rows(path) if os.path.exists(path) else []
+    if not rows:
+        return [Finding("honesty", severity, rel, "Chưa có dòng xác nhận của sinh viên; cần tự đọc và tự ký trước khi gộp, gửi giảng viên hoặc chốt một phiên bản.")]
+    version = rows[-1][1].strip("`")
+    sources = [item for item in config.get("sources", [])]
+    command = ["git", "-C", root, "rev-list", "--count", f"{version}..HEAD", "--", *expand_sources(root, sources)]
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if result.returncode != 0:
+        return [Finding("honesty", "low", rel, f"Không đối chiếu được phiên bản đã ký '{version}' với lịch sử git.")]
+    count = int(result.stdout.strip() or 0)
+    if count:
+        return [Finding("honesty", "medium", rel, f"Có {count} commit đổi nội dung sau phiên bản đã ký '{version}'; cần đọc và xác nhận lại trước khi chốt.")]
+    return []
+
+
 def check_measurements(doc, known):
     findings = []
     for line in doc.lines:
@@ -674,6 +709,7 @@ def run_checks(root, config):
     docs = [load_document(root, rel) for rel in expand_sources(root, config.get("sources", []))]
     findings, rows = check_claims(root, config)
     findings += check_ai_log(root, config)
+    findings += check_signoff(root, config)
     known = claim_numbers(rows)
     for doc in docs:
         findings += check_measurements(doc, known)

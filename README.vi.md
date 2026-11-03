@@ -52,9 +52,9 @@ Nói với agent bằng tiếng Việt hoặc tiếng Anh, ví dụ:
 - "Rà Chương 5 trước khi em gửi thầy."
 - "Chỉ kiểm tra văn phong và trình bày."
 
-Nên chạy phần rà trong một phiên mới, tách khỏi phiên đã viết nháp.
+Nên chạy phần rà trong một phiên mới, tách khỏi phiên đã viết nháp. Trước khi gộp, gửi giảng viên hoặc chốt một phiên bản, sinh viên tự đọc phần thay đổi và tự ký vào `docs/sign-off.md`.
 
-Bộ skill lưu tệp trong dự án đồ án: `.thesis/` (trường, loại đồ án, ngôn ngữ, căn cứ trình bày), `evidence/claims.csv` (từng con số và nguồn), `docs/ai-log.md` (phần AI đã tham gia) và `docs/gate-record.md` (cảnh báo và quyết định của sinh viên).
+Bộ skill lưu tệp trong dự án đồ án: `.thesis/` (trường, loại đồ án, ngôn ngữ, căn cứ trình bày), `evidence/claims.csv` (từng con số và nguồn), `docs/ai-log.md` (phần AI đã tham gia), `docs/gate-record.md` (cảnh báo và quyết định của sinh viên) và `docs/sign-off.md` (phần sinh viên đã đọc và xác nhận).
 
 Phần rà chạy năm gate: trung thực, logic, bố cục, trình bày và văn phong. Gate chỉ cảnh báo, và không có cảnh báo cũng không có nghĩa là được duyệt: quyền quyết định thuộc giảng viên và hội đồng.
 
@@ -65,6 +65,7 @@ Phần rà chạy năm gate: trung thực, logic, bố cục, trình bày và v�
 - Coi kết quả do AI tự tạo là số đo của sinh viên.
 - Giúp né công cụ phát hiện AI, cố tình thêm lỗi cho giống người viết, hay giấu việc dùng AI.
 - Khẳng định đồ án đã đúng quy định của trường.
+- Xác nhận thay sinh viên, hoặc gộp, gắn tag, gửi một phiên bản sinh viên chưa ký.
 
 ## Loại đồ án và các trường
 
