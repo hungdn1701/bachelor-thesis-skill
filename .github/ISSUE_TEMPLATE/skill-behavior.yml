@@ -1,0 +1,37 @@
+name: Skill behavior / Hành vi của skill
+description: A skill or the checker did something wrong or unhelpful. / Skill hoặc script làm sai hoặc chưa hữu ích.
+labels: [behavior]
+body:
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - bachelor-thesis-writing
+        - bachelor-thesis-review
+        - check_thesis.py
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: What was asked / Yêu cầu là gì
+      description: Use made-up thesis content. / Hãy dùng nội dung đồ án giả định.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What it did / Skill đã làm gì
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected / Mong đợi điều gì
+    validations:
+      required: true
+  - type: input
+    id: tool
+    attributes:
+      label: AI tool and version / Công cụ AI và phiên bản

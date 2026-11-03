@@ -1,0 +1,44 @@
+{
+  "vi": {
+    "chat": [
+      "chắc chắn rồi", "tất nhiên rồi", "dưới đây là", "hy vọng điều này", "nếu bạn cần",
+      "bạn có muốn", "là một mô hình ngôn ngữ", "code bạn đã gửi", "theo như code bạn", "như bạn yêu cầu",
+      "tài liệu bạn cung cấp", "với tư cách là một ai"
+    ],
+    "tool": ["chatgpt", "claude", "gemini", "copilot", "prompt"],
+    "hype": [
+      "vượt trội", "đột phá", "hoàn hảo", "tuyệt vời", "cực kỳ", "vô cùng", "mạnh mẽ", "toàn diện",
+      "tiên tiến nhất", "hiện đại nhất", "hàng đầu", "bước ngoặt", "cách mạng hóa", "hứa hẹn", "then chốt",
+      "không thể thiếu", "tối ưu"
+    ],
+    "slop": [
+      "trong bối cảnh", "trong thời đại", "ngày càng phát triển mạnh mẽ", "có thể nói rằng", "không thể phủ nhận",
+      "điều quan trọng là", "đóng vai trò then chốt", "đóng vai trò quan trọng", "linh hoạt và mạnh mẽ",
+      "mạnh mẽ và linh hoạt", "nền tảng vững chắc", "bức tranh toàn cảnh", "kỷ nguyên số", "kim chỉ nam",
+      "chìa khóa", "hành trình", "đòn bẩy", "bệ phóng", "xương sống", "nói một cách khác", "tóm lại"
+    ],
+    "absolute": [
+      "luôn luôn", "luôn", "mọi", "tất cả", "tuyệt đối", "hoàn toàn", "không bao giờ", "duy nhất",
+      "chứng minh", "đảm bảo", "không có lỗi", "bất kỳ"
+    ]
+  },
+  "en": {
+    "chat": [
+      "certainly!", "of course!", "here is the", "here's the", "i hope this", "as an ai", "as a language model",
+      "you provided", "as you requested", "let me know if"
+    ],
+    "tool": ["chatgpt", "claude", "gemini", "copilot", "prompt"],
+    "hype": [
+      "outperforms", "groundbreaking", "revolutionary", "game-changing", "cutting-edge", "state-of-the-art",
+      "seamless", "robust", "powerful", "comprehensive", "unparalleled", "optimal"
+    ],
+    "slop": [
+      "delve", "tapestry", "landscape", "pivotal", "crucial", "foster", "showcase", "testament", "navigate",
+      "leverage", "realm", "embark", "underscore", "multifaceted", "in today's rapidly", "it is important to note",
+      "it is worth mentioning", "plays a vital role", "plays a crucial role"
+    ],
+    "absolute": [
+      "always", "never", "all", "every", "any", "only", "proves", "guarantees", "no errors", "cannot"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "school": "",
+  "faculty": "",
+  "type": "build",
+  "language": "vi",
+  "scope": "partial",
+  "sources": [],
+  "pdf": "",
+  "claims": "evidence/claims.csv",
+  "ai_log": "docs/ai-log.md",
+  "record": "docs/gate-record.md",
+  "profile": ".thesis/profile.json"
+}

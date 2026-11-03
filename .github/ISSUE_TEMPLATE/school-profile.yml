@@ -1,0 +1,23 @@
+name: School profile / Hồ sơ trường
+description: Propose or correct the format rules for a school. / Đề xuất hoặc sửa quy định trình bày của một trường.
+labels: [school-profile]
+body:
+  - type: input
+    id: school
+    attributes:
+      label: School and faculty / Trường và khoa
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Public sources / Nguồn công khai
+      description: Links to written rules or templates. Do not attach unpublished theses or personal data. / Liên kết tới văn bản quy định hoặc mẫu. Không đính kèm đồ án chưa công bố hay dữ liệu cá nhân.
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What should the profile say? / Hồ sơ nên ghi gì?
+    validations:
+      required: true

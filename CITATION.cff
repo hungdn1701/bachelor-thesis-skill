@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If this repository helps your work on thesis guidance, please cite it as below."
+title: "Bachelor Thesis Skills"
+abstract: "Agent skills for writing and reviewing bachelor theses in engineering, with honesty, logic, structure, format and style gates."
+type: software
+authors:
+  - family-names: "Dang"
+    given-names: "Hung N."
+    affiliation: "Posts and Telecommunications Institute of Technology (PTIT)"
+version: "0.1.0"
+license: CC-BY-4.0
+repository-code: "https://github.com/hungdn1701/bachelor-thesis-skill"
+keywords:
+  - agent-skills
+  - thesis
+  - academic-writing
+  - engineering-education
+  - vietnamese
