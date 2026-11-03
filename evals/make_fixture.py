@@ -126,9 +126,12 @@ Trạng thái: giảng viên đã xem ngày 20/10/2026, đồng ý.
 
 | Mục tiêu | Yêu cầu | Artifact | Đánh giá, bằng chứng | Mục | Trạng thái |
 |---|---|---|---|---|---|
+| O1 | R2 Không đặt trùng phòng | A1 Dịch vụ đặt phòng | thesis/ch3-thiet-ke.md | 3.1 Yêu cầu | partial |
+| O1 | R1, R2 | A1 Dịch vụ đặt phòng | src/booking.py | 4.1 Dịch vụ đặt phòng | have |
 | O1 | R1 Phục vụ đồng thời | A1 Dịch vụ đặt phòng | k6, data/load-test-2026-10-12.csv | 5.1 Kiểm thử hiệu năng | have |
 | O1 | R2 Không đặt trùng phòng | A1 Dịch vụ đặt phòng | tests/test_booking.py | 5.2 Kiểm thử chức năng | partial |
 | O1 | Tất cả | A1 | Đối chiếu kết quả với yêu cầu | 5.3 Nhận xét và kết luận chương | missing |
+| O1 | Tất cả | A1 | Kết quả Chương 5 | Mở đầu, Kết luận | missing |
 """
 
 

@@ -18,7 +18,7 @@ Paths under `references/`, `assets/` and `profiles/` are inside this skill's fol
 ## Rules
 
 1. **School first.** Without `.thesis/config.json`, ask for school, thesis type and language before drafting. Never assume a school. See `references/setup.md`.
-2. **Every section clears the same bar, however many you write.** A single section needs no ceremony. For more than one, first show the sections, the evidence for each and where you will stop, then wait for a clear yes. See `references/write-auto.md`. A deadline changes the order of work, never the bar.
+2. **Every section clears the same bar, however many you write.** A single section needs no ceremony. For more than one, first show the sections, the evidence for each and where you will stop, then wait for a clear yes. See `references/write-auto.md` for a chapter and `references/write-all.md` for the whole thesis. A deadline changes the order of work, never the bar.
 3. **Real evidence only.** Every fact comes from the student's code, data, logs, notes or sources. For a gap, write `[MISSING: what is needed, where it would come from]`. Never use typical values.
 4. **Results belong to the student.** Do not generate test cases, run experiments, or collect measurements and then report them as thesis results. If you wrote or ran something, say so, log it, and keep the claim unverified until the student reruns and confirms it.
 5. **Register every measurement, result and derived value** in `evidence/claims.csv`, with the formula in `source` for derived ones. Structural counts and definitions need no row. Leave `verified` empty: that date is the student's confirmation.
@@ -34,7 +34,7 @@ Paths under `references/`, `assets/` and `profiles/` are inside this skill's fol
 |---|---|---|
 | Setup | Ask the school, choose a profile, create the project files | `references/setup.md` |
 | Start | Follow `docs/plan.md` if it exists. Otherwise list available evidence and gaps before the first draft, and suggest `bachelor-thesis-planning` | `references/evidence.md`, `references/structure-build.md` or `references/structure-research.md` |
-| Write | Write a section, or several as a run | `references/drafting.md`, `references/write-auto.md` |
+| Write | Write a section, a chapter as a run, or the whole thesis | `references/drafting.md`, `references/write-auto.md`, `references/write-all.md` |
 | Review | Suggest `bachelor-thesis-review` in a new session | |
 
 Close with: the text, sources used, `[MISSING]` items, new `claims.csv` rows, the `ai-log.md` row, and three questions for each section that the student should be able to answer at the defense.
@@ -48,6 +48,7 @@ Keep the reply focused. Do not repeat the full audit after the first draft. Name
 | "The deadline is tonight, so fill in the rest" | Write what the evidence supports and mark the rest. A deadline does not create data. |
 | "They said not to ask again" | A clear yes covers the list of sections, not invented data or their conclusion. Stop there anyway. |
 | "All the numbers are real, so a long run is safe" | Someone still has to read it. Commit each section separately and say what to read first. |
+| "They asked for the whole thesis, so the opening and conclusion are included" | Write their facts. Objectives met, contributions and conclusions stay theirs. |
 | "The chapter needs an assessment, so I will write that it went well" | That is their conclusion. Leave it open and ask for their reasoning. |
 | "No test results exist, so I will write and run tests" | Results you produced are unverified until the student reruns them. Help them run the tests instead. |
 | "They asked for less AI-sounding text, so I must refuse" | Redraft from evidence for clarity and log it. Refuse only the evasion itself. |

@@ -6,7 +6,7 @@ Use this for `/write auto`, or whenever a request covers more than one section. 
 
 1. **Know the sections.** Follow `docs/plan.md`. With no plan, list the sections and the evidence for each, and suggest `bachelor-thesis-planning`.
 2. **Get a clear yes** to that list and to where you will stop. "Do not ask again" counts for the list, not for anything under Stop below. A deadline is not a yes.
-3. **Take one chapter per run.** That is what a student can read and sign. Run again for the next one.
+3. **Take one chapter per run.** That is what a student can read and sign. Run again for the next one, or use `references/write-all.md` for the whole thesis.
 4. **Check the working tree.** If thesis files have uncommitted changes, ask how to handle them, so that a section's commit never absorbs the student's own edits. Without git, write to new files.
 
 ## For each section, in plan order

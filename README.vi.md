@@ -25,7 +25,7 @@ Các agent skill đưa một đồ án tốt nghiệp đại học ngành kỹ t
 |---|---|---|---|
 | Ý tưởng | `/idea` | "Tinh chỉnh giúp em ý tưởng đồ án về ..." | Làm rõ ý tưởng của sinh viên thành đề cương: vấn đề, các hướng, mục tiêu, giả định, phần không làm. Không chọn đề tài thay sinh viên |
 | Kế hoạch | `/plan` | "Lập kế hoạch đồ án từ code và dữ liệu này." | Nối từng mục tiêu với artifact, bằng chứng và mục viết, rồi liệt kê phần còn thiếu |
-| Viết | `/write`, `/write auto` | "Viết mục 5.1 từ `data/`." "Viết Chương 5 theo kế hoạch trong một lượt." | Viết từ bằng chứng thật và ghi lại phần AI đã tham gia. Chế độ auto chạy một chương của kế hoạch sau một lần đồng ý rõ ràng, và dừng ở những gì chỉ sinh viên quyết định được |
+| Viết | `/write`, `/write auto`, `/write all` | "Viết mục 5.1 từ `data/`." "Viết Chương 5 theo kế hoạch trong một lượt." "Viết cả quyển theo kế hoạch." | Viết từ bằng chứng thật và ghi lại phần AI đã tham gia. Chế độ auto chạy một chương của kế hoạch sau một lần đồng ý rõ ràng. Chế độ all chạy mọi chương trên một nhánh riêng, tuần tự hoặc bằng nhiều agent song song. Cả hai dừng ở những gì chỉ sinh viên quyết định được |
 | Rà | `/review` | "Rà Chương 5." | Đọc như một giảng viên khó tính qua năm gate: trung thực, logic, bố cục, trình bày, văn phong. Chỉ cảnh báo, không sửa bài |
 | Bảo vệ | `/defense` | "Luyện bảo vệ Chương 5." | Hội đồng giả, kiểm tra các khẳng định bằng chính bằng chứng của sinh viên |
 | Bản cuối | `/final` | "Trước khi nộp còn thiếu gì?" | Liệt kê mọi việc còn mở. Không bao giờ nói đồ án đã sẵn sàng |

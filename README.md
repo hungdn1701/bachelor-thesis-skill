@@ -25,7 +25,7 @@ Agent skills that take a bachelor thesis in engineering from an idea to submissi
 |---|---|---|---|
 | Idea | `/idea` | "Refine my thesis idea about ..." | Sharpens your idea into a proposal: the problem, directions, objectives, assumptions, what you will not do. It does not pick a topic for you |
 | Plan | `/plan` | "Plan my thesis from this code and data." | Connects each objective to an artifact, evidence and a section, and lists the gaps |
-| Write | `/write`, `/write auto` | "Write section 5.1 from `data/`." "Write chapter 5 from the plan in one run." | Writes from real evidence and keeps your use of AI on record. Auto runs a chapter of the plan after one clear yes, and stops at what only you can decide |
+| Write | `/write`, `/write auto`, `/write all` | "Write section 5.1 from `data/`." "Write chapter 5 from the plan in one run." "Write the whole thesis from the plan." | Writes from real evidence and keeps your use of AI on record. Auto runs a chapter of the plan after one clear yes. All runs every chapter on its own branch, one by one or with parallel agents. Both stop at what only you can decide |
 | Review | `/review` | "Review chapter 5." | A strict advisor's reading through five gates: honesty, logic, structure, format, style. It only warns and never edits |
 | Defense | `/defense` | "Rehearse my defense on chapter 5." | A committee that tests your claims against your evidence |
 | Final | `/final` | "What is still open before I submit?" | Lists every open item. It never says the thesis is ready |
