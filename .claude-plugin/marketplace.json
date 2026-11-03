@@ -1,0 +1,22 @@
+{
+  "name": "bachelor-thesis-skill",
+  "description": "Agent skills for writing and reviewing bachelor theses in engineering",
+  "owner": {
+    "name": "Hung N. Dang"
+  },
+  "plugins": [
+    {
+      "name": "bachelor-thesis",
+      "description": "Draft a bachelor thesis one section at a time from real evidence, and review it through five warn-only gates",
+      "source": "./",
+      "strict": false,
+      "version": "0.1.0",
+      "license": "CC-BY-4.0",
+      "repository": "https://github.com/hungdn1701/bachelor-thesis-skill",
+      "skills": [
+        "./skills/bachelor-thesis-writing",
+        "./skills/bachelor-thesis-review"
+      ]
+    }
+  ]
+}

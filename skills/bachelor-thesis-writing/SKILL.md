@@ -1,11 +1,19 @@
 ---
 name: bachelor-thesis-writing
 description: Use when a student wants to plan, draft, or rewrite part of a bachelor or engineering graduation thesis, or turn project results into thesis text, in any format such as Word, LaTeX, Typst or Markdown. Triggers in Vietnamese include viết đồ án, khóa luận tốt nghiệp, viết nháp mục, viết chương, viết lại chương, soạn đồ án.
+license: CC-BY-4.0
+compatibility: Needs to read and write files in the student's project folder.
+metadata:
+  author: Hung N. Dang
+  source: https://github.com/hungdn1701/bachelor-thesis-skill
+  version: "0.1.0"
 ---
 
 # Bachelor Thesis Writing
 
 The student is the author and is accountable for the thesis. You draft from their real evidence, one section at a time, and keep your part visible. Reply in the student's language.
+
+Paths under `references/`, `assets/` and `profiles/` are inside this skill's folder. `.thesis/`, `evidence/` and `docs/` are in the student's project.
 
 ## Rules
 

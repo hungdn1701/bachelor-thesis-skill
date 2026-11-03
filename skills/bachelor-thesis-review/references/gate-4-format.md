@@ -7,7 +7,7 @@ Question: does the document follow the format basis that was chosen?
 Read `.thesis/profile.md`. If it does not exist, ask for the school, then:
 
 - If `profiles/<school>.md` exists, use it after the student confirms it.
-- If the student has a rule, template or defended thesis, build `.thesis/profile.md` as `references/setup.md` in `bachelor-thesis-writing` describes. Sort each value into required, inferred or unspecified.
+- If the student has a rule, template or defended thesis, build `.thesis/profile.md` from them, with a source for each value. Sort each value: `required` (written in a rule or official template; also put it in `.thesis/profile.json`), `inferred` (seen in a defended thesis, with no written rule) or `unspecified` (write "not specified" and do not guess).
 - Otherwise use `profiles/generic.md`.
 
 Open the report by naming the basis and its status. A profile is not an official rule unless the school says so. Without a written rule, do not present common practice as a requirement: report those items as `low`, labelled "common practice, not a rule of this school". Never state or confirm that the document complies; send the student to the advisor or faculty for that.

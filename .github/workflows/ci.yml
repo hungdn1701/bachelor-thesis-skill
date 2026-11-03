@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
+      - name: Install the YAML parser used to check skill frontmatter
+        run: python -m pip install pyyaml
       - name: Run tests
         env:
           PYTHONUTF8: "1"
