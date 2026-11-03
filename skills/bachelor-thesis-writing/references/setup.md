@@ -7,7 +7,7 @@ Run once per thesis. Ask only what is missing, and do not move the student to an
 - **School and faculty.** There is no default school.
 - **Thesis type:** `build` (the main result is a system) or `research` (the main result answers a research question through experiments or analysis). If both apply, choose by what the conclusion claims.
 - **Language:** `vi` or `en`.
-- **Sources:** the files that hold the thesis text, such as `.docx`, `.tex`, `.typ` or `.md`, and the exported PDF if any. If they are obvious from the folder, list them and tell the student rather than asking.
+- **Sources:** the files that hold the thesis text, such as `.docx`, `.tex`, `.typ` or `.md`, and the exported PDF if any. For Typst or LaTeX, list the main file: the checker follows `#include`, `\input` and `\include`, and finds `.bib` files in the project folder. If they are obvious from the folder, list them and tell the student rather than asking.
 
 ## 2. Choose the format basis
 
@@ -41,5 +41,6 @@ Create these in the thesis project, without overwriting existing ones:
 | `.thesis/profile.md`, `.thesis/profile.json` | Step 2 or 3 |
 | `evidence/claims.csv` | `assets/claims.csv` |
 | `docs/ai-log.md` | `assets/ai-log.md` |
+| `docs/sign-off.md` | `assets/sign-off.md` |
 
 In `config.json`, set `scope` to `partial` while chapters are missing and to `full` for the complete thesis.

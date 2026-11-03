@@ -379,5 +379,174 @@ class CommandLine(unittest.TestCase):
         self.assertFalse(os.path.exists(os.path.join(ws.root, "docs", "gate-record.md")))
 
 
+class TypstAndLatexSources(unittest.TestCase):
+    def workspace(self, sources, files, scope="partial"):
+        ws = Workspace(None, scope=scope)
+        self.addCleanup(ws.close)
+        for rel, content in files.items():
+            write(ws.root, rel, content)
+        with open(os.path.join(ws.root, ".thesis", "config.json"), encoding="utf-8") as handle:
+            config = json.load(handle)
+        config["sources"] = sources
+        write(ws.root, ".thesis/config.json", json.dumps(config))
+        return ws
+
+    def test_follows_typst_includes_and_reads_their_problems(self):
+        files = {"thesis/main.typ": '#include "chapters/a.typ"\n', "thesis/chapters/a.typ": "= A\n\n[MISSING: số liệu]\n"}
+        self.assertTrue(has(self.workspace(["thesis/main.typ"], files).findings(), "chapters/a.typ"))
+
+    def test_commented_out_include_is_not_followed(self):
+        files = {"thesis/main.typ": '// #include "old.typ"\n', "thesis/old.typ": "= A\n\n[MISSING: cũ]\n"}
+        self.assertFalse(has(self.workspace(["thesis/main.typ"], files).findings(), "old.typ"))
+
+    def test_follows_latex_input(self):
+        files = {"thesis/main.tex": "\\input{chapters/a}\n", "thesis/chapters/a.tex": "\\chapter{A}\n[MISSING: x]\n"}
+        self.assertTrue(has(self.workspace(["thesis/main.tex"], files).findings(), "chapters/a.tex"))
+
+    def test_typst_custom_headings_and_bibliography_count_as_parts(self):
+        main = (
+            "#unnumbered[Mở đầu]\n\n= Phân tích và thiết kế\n\n= Triển khai\n\n= Kiểm thử và đánh giá\n\n"
+            '#heading(level: 1, numbering: none)[Kết luận]\n\n#bibliography("refs.bib")\n'
+        )
+        findings = self.workspace(["thesis/main.typ"], {"thesis/main.typ": main}, scope="full").findings()
+        self.assertEqual([f.message for f in findings if "Không thấy phần" in f.message], [])
+
+    def test_typst_setup_lines_are_not_read_as_prose(self):
+        main = '#import "/lib/a.typ": *\n#set page(margin: 2.5cm)\n#show: thesis\n'
+        findings = self.workspace(["thesis/main.typ"], {"thesis/main.typ": main}).findings()
+        self.assertEqual([f.message for f in findings if f.where.startswith("thesis/main")], [])
+
+    def test_typst_block_comment_is_skipped(self):
+        draft = "/* ghi chú\n[MISSING: cũ]\n*/\n= A\n"
+        self.assertFalse(has(self.workspace(["thesis/a.typ"], {"thesis/a.typ": draft}).findings(), "MISSING"))
+
+    def test_unknown_cite_key_is_reported(self):
+        files = {
+            "thesis/a.typ": "= A\n\nTheo @nguon-that và @nguon-bia.\n",
+            "thesis/refs.bib": "@misc{nguon-that,\n  title = {X}\n}\n",
+        }
+        findings = self.workspace(["thesis/a.typ"], files).findings()
+        self.assertTrue(has(findings, "'nguon-bia'"))
+        self.assertFalse(has(findings, "'nguon-that'"))
+
+    def test_labels_in_other_chapters_resolve_in_a_partial_review(self):
+        files = {"thesis/a.typ": "= A\n\nXem @fig-b.\n", "thesis/b.typ": '#figure(\n  image("x.png"),\n) <fig-b>\n'}
+        self.assertFalse(has(self.workspace(["thesis/a.typ"], files).findings(), "'fig-b'"))
+
+    def test_email_and_raw_text_are_not_citations(self):
+        draft = "= A\n\nLiên hệ me@example.com hoặc chạy `npm i @types/node`.\n"
+        self.assertFalse(has(self.workspace(["thesis/a.typ"], {"thesis/a.typ": draft}).findings(), "Tham chiếu"))
+
+    def test_figure_without_a_reference_is_reported(self):
+        draft = '= A\n\n#figure(\n  image("x.png"),\n  caption: [Một hình],\n) <fig-lech>\n'
+        self.assertTrue(has(self.workspace(["thesis/a.typ"], {"thesis/a.typ": draft}).findings(), "<fig-lech>"))
+
+    def test_written_number_with_automatic_figures_is_low(self):
+        draft = '= A\n\nHình 1.1 cho thấy.\n\n#figure(\n  image("x.png"),\n  caption: [Một hình],\n)\n'
+        findings = self.workspace(["thesis/a.typ"], {"thesis/a.typ": draft}).findings()
+        self.assertEqual([f.severity for f in findings if "Hình 1.1" in f.message], ["low"])
+
+    def test_latex_cite_keys_and_named_citation_use_the_bib_file(self):
+        files = {
+            "thesis/a.tex": "\\chapter{A}\nTheo \\cite{nguyen2024,thieu} và Nguyen et al. (2024).\n",
+            "thesis/refs.bib": "@article{nguyen2024,\n  author = {Nguyen, A.},\n  year = {2024}\n}\n",
+        }
+        findings = self.workspace(["thesis/a.tex"], files).findings()
+        self.assertTrue(has(findings, "'thieu'"))
+        self.assertFalse(has(findings, "'nguyen2024'"))
+        self.assertFalse(has(findings, "'Nguyen (2024)'"))
+
+
+class SignOff(unittest.TestCase):
+    HEADER = "| Ngày | Phiên bản | Phạm vi | Mục đích | Người xác nhận |\n|---|---|---|---|---|\n"
+
+    def workspace(self, table=None, scope="partial"):
+        ws = Workspace("# Mở đầu\n\nA\n", scope=scope)
+        self.addCleanup(ws.close)
+        with open(os.path.join(ws.root, ".thesis", "config.json"), encoding="utf-8") as handle:
+            config = json.load(handle)
+        config["signoff"] = "docs/sign-off.md"
+        write(ws.root, ".thesis/config.json", json.dumps(config))
+        if table is not None:
+            write(ws.root, "docs/sign-off.md", self.HEADER + table)
+        return ws
+
+    def git(self, ws, *args):
+        command = ["git", "-C", ws.root, "-c", "user.name=t", "-c", "user.email=t@example.invalid", *args]
+        return subprocess.run(command, capture_output=True, text=True, check=True).stdout.strip()
+
+    def commit(self, ws, message):
+        self.git(ws, "add", "-A")
+        self.git(ws, "commit", "-qm", message)
+        return self.git(ws, "rev-parse", "--short", "HEAD")
+
+    def signoff_findings(self, ws):
+        return [f for f in ws.findings() if f.where == "docs/sign-off.md"]
+
+    def test_config_without_the_key_stays_quiet(self):
+        ws = Workspace("# Mở đầu\n\nA\n")
+        self.addCleanup(ws.close)
+        self.assertFalse(has(ws.findings(), "sign-off"))
+
+    def test_missing_file_is_low_in_a_partial_review(self):
+        self.assertEqual([f.severity for f in self.signoff_findings(self.workspace())], ["low"])
+
+    def test_missing_row_is_medium_for_the_full_thesis(self):
+        self.assertEqual([f.severity for f in self.signoff_findings(self.workspace("", scope="full"))], ["medium"])
+
+    def test_row_without_a_name_does_not_count(self):
+        findings = self.signoff_findings(self.workspace("| 2026-11-03 | abc1234 | Chương 5 | gửi GVHD |  |\n"))
+        self.assertTrue(has(findings, "Chưa có dòng xác nhận"))
+
+    def test_signed_current_version_is_quiet(self):
+        ws = self.workspace()
+        self.git(ws, "init", "-q")
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/sign-off.md", self.HEADER + f"| 2026-11-03 | {version} | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        self.assertEqual(self.signoff_findings(ws), [])
+
+    def test_text_changed_after_signing_is_reported(self):
+        ws = self.workspace()
+        self.git(ws, "init", "-q")
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/sign-off.md", self.HEADER + f"| 2026-11-03 | {version} | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        write(ws.root, ws.source, "# Mở đầu\n\nB\n")
+        self.commit(ws, "second")
+        self.assertTrue(has(self.signoff_findings(ws), "1 commit"))
+
+    def test_unknown_version_is_low(self):
+        ws = self.workspace("| 2026-11-03 | khong-co | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        self.git(ws, "init", "-q")
+        self.commit(ws, "first")
+        self.assertEqual([f.severity for f in self.signoff_findings(ws)], ["low"])
+
+
+@unittest.skipIf(importlib.util.find_spec("pymupdf") is None, "PyMuPDF is not installed")
+class PdfLayout(unittest.TestCase):
+    def findings_for(self, left_cm, size):
+        import pymupdf
+
+        document = pymupdf.open()
+        for _ in range(2):
+            page = document.new_page(width=595.28, height=841.89)
+            for index in range(14):
+                y = 2.5 * 28.3465 + size * 0.9 + index * 20
+                page.insert_text((left_cm * 28.3465, y), "x", fontsize=size)
+                # Ends at the right margin of 2 cm; Helvetica "x" is 0.5 em wide.
+                page.insert_text((595.28 - 2 * 28.3465 - size * 0.5, y), "x", fontsize=size)
+        try:
+            return checker.check_pdf_layout(document, "dist.pdf", PROFILE)
+        finally:
+            document.close()
+
+    def test_matching_layout_is_quiet(self):
+        self.assertEqual([f.message for f in self.findings_for(3.0, 13)], [])
+
+    def test_wrong_margin_and_size_are_reported(self):
+        findings = self.findings_for(4.0, 11)
+        self.assertTrue(has(findings, "Lề left"))
+        self.assertTrue(has(findings, "Cỡ chữ"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -17,7 +17,7 @@ Paths under `references/`, `assets/`, `profiles/`, `scripts/` and `data/` are in
 
 ## Rules
 
-1. **Read only.** Never change thesis files, even when told "just fix it". Put suggested wording in the report; the student or `bachelor-thesis-writing` applies it. You write only `docs/gate-record.md` and, if missing, the setup files in `.thesis/`.
+1. **Read only.** Never change thesis files, even when told "just fix it". Put suggested wording in the report; the student or `bachelor-thesis-writing` applies it. You write only `docs/gate-record.md` and, if missing, the setup files in `.thesis/`. Never write in `docs/sign-off.md`: that confirmation is the student's.
 2. **No verdict.** Never call the thesis or a gate passed, failed, "Đạt" or "Chưa đạt", and never write such a result on request. Report the number of open warnings by severity. The decision belongs to the advisor and committee.
 3. **Five gates, in order:** honesty, logic, structure, format, style. A request for a review runs all five. A question about one aspect, such as format, runs that gate only: mention anything serious you happen to see in a line or two, and offer the rest. Always list what was skipped.
 4. **Anchor every finding** to `file:line` or a short quote. Tag it `[Script]` or `[Agent]`, and keep `[Script]` if you change its severity. Script output is a candidate: read the text before keeping it.
@@ -34,7 +34,7 @@ Paths under `references/`, `assets/`, `profiles/`, `scripts/` and `data/` are in
 3. For each gate, read its reference, then read the thesis text:
    `references/gate-1-honesty.md`, `gate-2-logic.md`, `gate-3-structure.md`, `gate-4-format.md`, `gate-5-style.md`.
 4. Write the report in the format of `assets/gate-record.md`, into `docs/gate-record.md`.
-5. Reply with: the basis, counts by gate and severity, the three findings to handle first, and the reminder that this is not an approval.
+5. Reply with: the basis, counts by gate and severity, the three findings to handle first, whether the version is signed in `docs/sign-off.md`, and the reminder that this is not an approval.
 
 ## Severity
 
@@ -58,4 +58,4 @@ Paths under `references/`, `assets/`, `profiles/`, `scripts/` and `data/` are in
 
 ## Red flags
 
-Stop if you are about to: edit or delete anything in the thesis; write a pass or fail; fill in the student's column; state that the format complies; report a script hit you have not read in context.
+Stop if you are about to: edit or delete anything in the thesis; write a pass or fail; fill in the student's column; state that the format complies; report a script hit you have not read in context; sign for the student.
