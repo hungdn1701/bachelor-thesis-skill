@@ -1,6 +1,6 @@
 # Setup
 
-Run once per thesis. Ask only what is missing, and do not move the student to another writing tool.
+Run once per thesis. Ask only what is missing, taking the thesis type from `docs/proposal.md` if it exists, and do not move the student to another writing tool.
 
 ## 1. Ask
 

@@ -5,14 +5,38 @@
 
 [English](README.md)
 
-Các agent skill giúp viết và rà đồ án tốt nghiệp đại học ngành kỹ thuật. Bộ skill dùng được với Word, LaTeX, Typst và Markdown, không mặc định bất kỳ trường nào.
+Các agent skill đưa một đồ án tốt nghiệp đại học ngành kỹ thuật đi từ ý tưởng đến lúc nộp. Quyển đồ án là sản phẩm; mã nguồn, mô hình, bộ dữ liệu hay khảo sát là artifact, tức bằng chứng cho những gì đồ án khẳng định. Bộ skill dùng được với Word, LaTeX, Typst và Markdown, không mặc định bất kỳ trường nào.
 
-| Skill | Làm gì |
-|---|---|
-| `bachelor-thesis-writing` | Hỏi trường, loại đồ án và ngôn ngữ; kiểm kê bằng chứng; viết nháp từng mục từ dữ liệu thật |
-| `bachelor-thesis-review` | Rà đồ án hoặc từng chương như một giảng viên khó tính qua năm gate. Skill chỉ cảnh báo, không sửa bài |
+```
+  Ý TƯỞNG      KẾ HOẠCH       VIẾT          RÀ         BẢO VỆ      BẢN CUỐI
+┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
+│ Câu hỏi │─▶│Luận điểm│─▶│Từng mục │─▶│ Năm gate│─▶│Hội đồng │─▶│ Chữ ký  │
+│Đề cương │  │Artifact │  │ Số liệu │  │Cảnh báo │  │ Câu hỏi │  │Việc còn │
+└─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘
+   /idea        /plan       /write       /review     /defense      /final
+                  ▲            ▲            │
+                  │            └──── sửa ───┘
+           Đã có artifact
+```
 
-Tác giả vẫn là sinh viên. Bộ skill giúp dùng AI cho đúng cách, không thay cho nhận định của sinh viên hay giảng viên hướng dẫn.
+## Các bước
+
+| Bước | Lệnh | Hoặc nói | Làm gì |
+|---|---|---|---|
+| Ý tưởng | `/idea` | "Tinh chỉnh giúp em ý tưởng đồ án về ..." | Làm rõ ý tưởng của sinh viên thành đề cương: vấn đề, các hướng, mục tiêu, giả định, phần không làm. Không chọn đề tài thay sinh viên |
+| Kế hoạch | `/plan` | "Lập kế hoạch đồ án từ code và dữ liệu này." | Nối từng mục tiêu với artifact, bằng chứng và mục viết, rồi liệt kê phần còn thiếu |
+| Viết | `/write`, `/write auto` | "Viết mục 5.1 từ `data/`." "Viết Chương 5 theo kế hoạch trong một lượt." | Viết từ bằng chứng thật và ghi lại phần AI đã tham gia. Chế độ auto chạy một chương của kế hoạch sau một lần đồng ý rõ ràng, và dừng ở những gì chỉ sinh viên quyết định được |
+| Rà | `/review` | "Rà Chương 5." | Đọc như một giảng viên khó tính qua năm gate: trung thực, logic, bố cục, trình bày, văn phong. Chỉ cảnh báo, không sửa bài |
+| Bảo vệ | `/defense` | "Luyện bảo vệ Chương 5." | Hội đồng giả, kiểm tra các khẳng định bằng chính bằng chứng của sinh viên |
+| Bản cuối | `/final` | "Trước khi nộp còn thiếu gì?" | Liệt kê mọi việc còn mở. Không bao giờ nói đồ án đã sẵn sàng |
+
+Trên Claude Code, lệnh có dạng `/bachelor-thesis:idea`. Các agent khác không có lệnh, chỉ cần nói yêu cầu.
+
+**Hai điểm vào.** Có ý tưởng hoặc mới chỉ có mối quan tâm thì bắt đầu ở `/idea`. Đã được giao đề tài hoặc đã làm xong phần việc thì bắt đầu ở `/plan`. Cả hai đều đi về cùng một chuỗi từ mục tiêu đến kết luận, và phần nào đặt sau khi đo đều được ghi rõ.
+
+**Hai chốt của con người.** Giảng viên quyết định về đề cương. Trước khi gộp, gửi giảng viên hoặc chốt một phiên bản, sinh viên tự đọc phần thay đổi và tự ký vào `docs/sign-off.md`.
+
+Nên chạy phần rà trong một phiên mới, tách khỏi phiên đã viết. Việc làm ra artifact là của sinh viên và các công cụ khác; với phần mềm, có thể dùng [agent-skills](https://github.com/addyosmani/agent-skills) song song.
 
 ## Cài đặt
 
@@ -30,42 +54,37 @@ npx skills add hungdn1701/bachelor-thesis-skill
 
 Hoặc chép các thư mục trong `skills/` vào thư mục skill của agent, ví dụ `.claude/skills/` hay `.agents/skills/`. Script rà cần Python 3.9 trở lên; nếu không có Python, việc rà vẫn tiếp tục bằng cách đọc văn bản.
 
+| Skill | Các bước |
+|---|---|
+| `bachelor-thesis-planning` | Ý tưởng, Kế hoạch |
+| `bachelor-thesis-writing` | Viết |
+| `bachelor-thesis-review` | Rà, Bảo vệ, Bản cuối |
+
 ## Các agent được hỗ trợ
 
 Bộ skill dùng định dạng mở [Agent Skills](https://agentskills.io). Agent cần nạp được định dạng này, đọc và ghi được tệp trong dự án, và chạy được lệnh. Các ứng dụng chat không truy cập được thư mục dự án không nằm trong phạm vi hỗ trợ.
 
 | Tình trạng | Agent |
 |---|---|
-| Đã chạy cả hai skill đúng như thiết kế | Claude Code, GitHub Copilot CLI |
-| Đã chạy, nhưng chỉ tuân theo một phần quy tắc | Antigravity CLI |
+| Đã chạy các bước đã thử đúng như thiết kế | Claude Code |
+| Đã chạy phần viết và rà đúng như thiết kế ở v0.1 | GitHub Copilot CLI |
+| Đã chạy phần viết và rà, nhưng chỉ tuân theo một phần quy tắc ở v0.1 | Antigravity CLI |
 | Nạp được skill, chưa chạy thử | Gemini CLI (cần tin cậy thư mục trước) |
 | Chưa thử | Codex, Cursor và [các agent khác trong danh sách của công cụ cài](https://github.com/vercel-labs/skills/blob/main/docs/agents.md) |
 
 Kết quả này đến từ vài lượt chạy trên dự án giả tưởng ([chi tiết](evals/RESULTS.md)). Rất mong nhận báo cáo khi dùng với các agent khác.
 
-## Cách dùng
-
-Nói với agent bằng tiếng Việt hoặc tiếng Anh, ví dụ:
-
-- "Thiết lập giúp em dự án đồ án."
-- "Viết nháp mục 5.1 từ dữ liệu trong `data/`."
-- "Rà Chương 5 trước khi em gửi thầy."
-- "Chỉ kiểm tra văn phong và trình bày."
-
-Nên chạy phần rà trong một phiên mới, tách khỏi phiên đã viết nháp. Trước khi gộp, gửi giảng viên hoặc chốt một phiên bản, sinh viên tự đọc phần thay đổi và tự ký vào `docs/sign-off.md`.
-
-Bộ skill lưu tệp trong dự án đồ án: `.thesis/` (trường, loại đồ án, ngôn ngữ, căn cứ trình bày), `evidence/claims.csv` (từng con số và nguồn), `docs/ai-log.md` (phần AI đã tham gia), `docs/gate-record.md` (cảnh báo và quyết định của sinh viên) và `docs/sign-off.md` (phần sinh viên đã đọc và xác nhận).
-
-Phần rà chạy năm gate: trung thực, logic, bố cục, trình bày và văn phong. Gate chỉ cảnh báo, và không có cảnh báo cũng không có nghĩa là được duyệt: quyền quyết định thuộc giảng viên và hội đồng.
-
 ## Những việc bộ skill không làm
 
-- Bịa số liệu, kết quả, trích dẫn, chữ ký hay xác nhận.
-- Viết nguyên một chương hoặc cả quyển trong một yêu cầu.
-- Coi kết quả do AI tự tạo là số đo của sinh viên.
+- Chọn đề tài thay sinh viên, hoặc bịa số liệu, kết quả, trích dẫn, chữ ký hay xác nhận.
+- Viết kết luận thay sinh viên, hoặc coi kết quả do AI tự tạo là số đo của sinh viên.
 - Giúp né công cụ phát hiện AI, cố tình thêm lỗi cho giống người viết, hay giấu việc dùng AI.
-- Khẳng định đồ án đã đúng quy định của trường.
+- Nói đồ án đã sẵn sàng, hay đã đúng quy định của trường.
 - Xác nhận thay sinh viên, hoặc gộp, gắn tag, gửi một phiên bản sinh viên chưa ký.
+
+## Các tệp trong dự án
+
+`docs/proposal.md`, `docs/plan.md` và `docs/decisions.md` (ý tưởng, chuỗi luận điểm, lý do của từng lựa chọn), `.thesis/` (trường, loại đồ án, ngôn ngữ, căn cứ trình bày), `evidence/claims.csv` (từng con số và nguồn), `docs/ai-log.md` (phần AI đã tham gia), `docs/gate-record.md` (cảnh báo và quyết định của sinh viên), `docs/defense-notes.md` (câu hỏi luyện bảo vệ) và `docs/sign-off.md` (phần sinh viên đã đọc và xác nhận).
 
 ## Loại đồ án và các trường
 
@@ -75,7 +94,7 @@ Không có trường mặc định. Skill hỏi trường của sinh viên, rồ
 
 ## Về dự án này
 
-Đây là đóng góp cá nhân của tôi, Đặng Ngọc Hùng (giảng viên, PTIT), trước hết để hỗ trợ sinh viên nhóm tôi hướng dẫn. Tôi chịu trách nhiệm về các quy ước trong repo. Repo không phải văn bản của PTIT hay bất kỳ đơn vị nào. Ai thấy phù hợp thì dùng, không bắt buộc. Sau này có trở thành chính thức hay không sẽ tính sau.
+Đây là đóng góp cá nhân của tôi, Đặng Ngọc Hùng (giảng viên, PTIT), trước hết để hỗ trợ sinh viên nhóm tôi hướng dẫn. Tôi chịu trách nhiệm về các quy ước trong repo. Repo không phải văn bản của PTIT hay bất kỳ đơn vị nào. Ai thấy phù hợp thì dùng, không bắt buộc. Sau này có trở thành chính thức hay không sẽ tính sau. Ý tưởng về vòng đời được phỏng theo [agent-skills](https://github.com/addyosmani/agent-skills) và viết lại cho đồ án.
 
 ## Đóng góp
 

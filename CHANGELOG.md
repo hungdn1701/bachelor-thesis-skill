@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 (unreleased)
+
+- From an idea to submission: `/idea`, `/plan`, `/write`, `/review`, `/defense`, `/final`.
+- New `bachelor-thesis-planning` skill: refine the student's idea, write a proposal, connect objectives, artifacts, evidence and sections, and keep a decision log. Work can start from an idea or from existing work.
+- `bachelor-thesis-writing` no longer limits a request to one section. Every section clears the same bar, and a run over several sections needs a clear yes, stops at what only the student can decide, and commits each section separately.
+- `bachelor-thesis-review` also rehearses the defense and lists what is open before submitting, without a verdict.
+
 ## 0.1.0 (unreleased)
 
 - First version of `bachelor-thesis-writing` and `bachelor-thesis-review`.

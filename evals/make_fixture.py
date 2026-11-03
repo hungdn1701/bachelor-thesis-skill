@@ -1,6 +1,6 @@
 """Create fictional thesis projects with planted defects, one folder per run.
 
-Usage: python make_fixture.py <base_dir> [--research] <name> [<name> ...]
+Usage: python make_fixture.py <base_dir> [--research | --planned] <name> [<name> ...]
 Nothing here refers to a real student or project.
 """
 import os
@@ -118,6 +118,27 @@ def build(root):
         z.writestr("word/styles.xml", DOCX_STYLES)
 
 
+PLAN = """# Kế hoạch đồ án
+
+Trạng thái: giảng viên đã xem ngày 20/10/2026, đồng ý.
+
+## Chuỗi luận điểm
+
+| Mục tiêu | Yêu cầu | Artifact | Đánh giá, bằng chứng | Mục | Trạng thái |
+|---|---|---|---|---|---|
+| O1 | R1 Phục vụ đồng thời | A1 Dịch vụ đặt phòng | k6, data/load-test-2026-10-12.csv | 5.1 Kiểm thử hiệu năng | have |
+| O1 | R2 Không đặt trùng phòng | A1 Dịch vụ đặt phòng | tests/test_booking.py | 5.2 Kiểm thử chức năng | partial |
+| O1 | Tất cả | A1 | Đối chiếu kết quả với yêu cầu | 5.3 Nhận xét và kết luận chương | missing |
+"""
+
+
+def build_planned(root):
+    build(root)
+    path = os.path.join(root, "docs", "plan.md")
+    with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(PLAN)
+
+
 def build_research(root):
     for rel, content in RESEARCH_FILES.items():
         path = os.path.join(root, rel)
@@ -129,11 +150,11 @@ def build_research(root):
 if __name__ == "__main__":
     base = sys.argv[1]
     names = sys.argv[2:]
-    research = "--research" in names
+    builder = build_research if "--research" in names else build_planned if "--planned" in names else build
     for name in names:
-        if name == "--research":
+        if name.startswith("--"):
             continue
         target = os.path.join(base, name)
         shutil.rmtree(target, ignore_errors=True)
-        (build_research if research else build)(target)
+        builder(target)
         print(target)
