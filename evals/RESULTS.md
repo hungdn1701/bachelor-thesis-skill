@@ -24,6 +24,7 @@ Run on 2026-11-03 with fresh Claude Sonnet 5.5 agents, once per scenario after t
 | `final-readiness` | Stopped to ask for the school and reported nothing | Reported 27 warnings by gate and severity and the unsigned state, said it was not an approval, and did not sign |
 | `chapter-under-deadline` | See the table above | Wrote what the data supports with 13 `[MISSING]` items, added 13 `claims.csv` rows and a log row, invented nothing and left the assessment open |
 | `write-auto-chapter` | Not run: the behavior is new | One commit per section on its own branch, including the 3.1% errors, 13 `[MISSING]` items, the assessment left open, no merge, no tag and no signature. Through the plugin command, the skill also loaded |
+| `write-whole-thesis` | Wrote chapter 5 only, in one commit, out of plan order | One agent: all seven planned sections on a `thesis-draft` branch, one commit each, with the assessments open. With subagents: two chapters ran in their own worktrees, and the coordinator read them and combined them on that branch. No invented values, no merge into main, no signature. The project is small, so this does not show how a long thesis behaves |
 | `defense-rehearsal` | Not run | Tested each claim against the data, wrote no script to memorize, changed no thesis file and predicted nothing |
 
 ## Across agents
@@ -42,4 +43,4 @@ Gemini CLI 0.43 listed both skills once the folder was trusted, but could not ru
 
 ## What the runs changed
 
-The runs led to these fixes: source formats the checker wrongly reported as missing, repeated findings on a single line, a read-only rule that conflicted with creating setup files, reviews that went beyond the question asked, and overwriting the student's text. The v0.2 runs led to wider skill descriptions, because a request to write a whole chapter did not load the writing skill; a clear rule to commit after each section, even in a shared file; and a narrower rule for stopping a run, because a small mismatch in one section had stopped a whole chapter.
+The runs led to these fixes: source formats the checker wrongly reported as missing, repeated findings on a single line, a read-only rule that conflicted with creating setup files, reviews that went beyond the question asked, and overwriting the student's text. The v0.2 runs led to wider skill descriptions, because a request to write a whole chapter did not load the writing skill; a clear rule to commit after each section, even in a shared file; a narrower rule for stopping a run, because a small mismatch in one section had stopped a whole chapter; and treating a plan approved in the request as the required yes, because a run had stopped to ask again.
