@@ -1,4 +1,4 @@
-# Drafting one section
+# Drafting a section
 
 ## Steps
 

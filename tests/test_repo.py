@@ -12,7 +12,8 @@ except ImportError:
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS = os.path.join(ROOT, "skills")
-NAMES = ("bachelor-thesis-writing", "bachelor-thesis-review")
+NAMES = ("bachelor-thesis-planning", "bachelor-thesis-writing", "bachelor-thesis-review")
+COMMANDS = ("idea", "plan", "write", "review", "defense", "final")
 
 
 def read(*parts):
@@ -93,6 +94,8 @@ class Skills(unittest.TestCase):
             base = os.path.join(SKILLS, name)
             texts = [("SKILL.md", read("skills", name, "SKILL.md"))]
             for folder in ("references", "profiles"):
+                if not os.path.isdir(os.path.join(base, folder)):
+                    continue
                 for item in os.listdir(os.path.join(base, folder)):
                     if item.endswith(".md"):
                         texts.append((item, read("skills", name, folder, item)))
@@ -113,6 +116,27 @@ class Skills(unittest.TestCase):
         for base, dirs, files in os.walk(ROOT):
             dirs[:] = [d for d in dirs if d not in (".git", "__pycache__", "skills")]
             self.assertNotIn("SKILL.md", files, base)
+
+
+class Commands(unittest.TestCase):
+    def test_every_step_has_a_command_that_names_its_skill(self):
+        for name in COMMANDS:
+            text = read("commands", f"{name}.md")
+            self.assertIn("disable-model-invocation: true", text, name)
+            self.assertTrue(any(skill in text for skill in NAMES), name)
+
+    def test_files_a_command_points_to_exist_in_its_skill(self):
+        for name in COMMANDS:
+            text = read("commands", f"{name}.md")
+            skill = next(skill for skill in NAMES if skill in text)
+            for ref in re.findall(r"`(references/[\w.-]+)`", text):
+                self.assertTrue(os.path.exists(os.path.join(SKILLS, skill, ref)), f"{name}: {ref}")
+
+    def test_readmes_name_every_command(self):
+        for readme in ("README.md", "README.vi.md"):
+            text = read(readme)
+            for name in COMMANDS:
+                self.assertIn(f"/{name}", text, f"{readme}: {name}")
 
 
 class Marketplace(unittest.TestCase):
@@ -149,6 +173,13 @@ class Profiles(unittest.TestCase):
         for name in os.listdir(writing):
             with open(os.path.join(writing, name), "rb") as first, open(os.path.join(review, name), "rb") as second:
                 self.assertEqual(first.read(), second.read(), name)
+
+    def test_structure_files_are_identical(self):
+        for name in ("structure-build.md", "structure-research.md"):
+            self.assertEqual(
+                read("skills", "bachelor-thesis-writing", "references", name),
+                read("skills", "bachelor-thesis-planning", "references", name),
+            )
 
     def test_config_templates_are_identical(self):
         self.assertEqual(

@@ -1,12 +1,12 @@
 ---
 name: bachelor-thesis-review
-description: Use when a student or advisor wants a bachelor or engineering graduation thesis, chapter or section reviewed for honesty, logic, structure, format or academic style, including pre-submission checks or requests for a review record. Triggers in Vietnamese include rà đồ án, rà chương, kiểm tra đồ án, chạy gate, biên bản rà, kiểm tra trước khi nộp, văn phong AI.
+description: Use when a student or advisor wants a bachelor or engineering graduation thesis, chapter or section reviewed for honesty, logic, structure, format or academic style, wants to rehearse the defense, or wants to check a final version before submitting, even when they only ask for a quick confirmation. Triggers in Vietnamese include rà đồ án, rà chương, kiểm tra đồ án, chạy gate, biên bản rà, kiểm tra trước khi nộp, sẵn sàng nộp, bản cuối, luyện bảo vệ, hội đồng giả, văn phong AI.
 license: CC-BY-4.0 (scripts/ under MIT, see scripts/LICENSE)
 compatibility: Needs to read files in the student's project folder and write the review record. The checker needs Python 3.9 or later; without it the review continues by reading only.
 metadata:
   author: Hung N. Dang
   source: https://github.com/hungdn1701/bachelor-thesis-skill
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Bachelor Thesis Review
@@ -15,10 +15,18 @@ You review like a strict advisor. Five gates produce warnings; the student decid
 
 Paths under `references/`, `assets/`, `profiles/`, `scripts/` and `data/` are inside this skill's folder. `.thesis/`, `evidence/` and `docs/` are in the student's project.
 
+## Jobs
+
+| The student wants | Do | Read |
+|---|---|---|
+| A review | The workflow below | The gate references |
+| To rehearse the defense | Test claims as a committee would | `references/defense.md` |
+| To check a final version | List what is still open | `references/final.md` |
+
 ## Rules
 
-1. **Read only.** Never change thesis files, even when told "just fix it". Put suggested wording in the report; the student or `bachelor-thesis-writing` applies it. You write only `docs/gate-record.md` and, if missing, the setup files in `.thesis/`. Never write in `docs/sign-off.md`: that confirmation is the student's.
-2. **No verdict.** Never call the thesis or a gate passed, failed, "Đạt" or "Chưa đạt", and never write such a result on request. Report the number of open warnings by severity. The decision belongs to the advisor and committee.
+1. **Read only.** Never change thesis files, even when told "just fix it". Put suggested wording in the report; the student or `bachelor-thesis-writing` applies it. You write only `docs/gate-record.md`, `docs/defense-notes.md` and, if missing, the setup files in `.thesis/`. Never write in `docs/sign-off.md`: that confirmation is the student's.
+2. **No verdict.** Never call the thesis or a gate passed, failed, ready, "Đạt", "Chưa đạt" or "sẵn sàng", never predict a defense, and never write such a result on request. Report the number of open warnings by severity. The decision belongs to the advisor and committee.
 3. **Five gates, in order:** honesty, logic, structure, format, style. A request for a review runs all five. A question about one aspect, such as format, runs that gate only: mention anything serious you happen to see in a line or two, and offer the rest. Always list what was skipped.
 4. **Anchor every finding** to `file:line` or a short quote. Tag it `[Script]` or `[Agent]`, and keep `[Script]` if you change its severity. Script output is a candidate: read the text before keeping it.
 5. **The student's column stays empty.** Never write the student's decision for them.
@@ -55,7 +63,13 @@ Paths under `references/`, `assets/`, `profiles/`, `scripts/` and `data/` are in
 | "They asked for a review but did not list style" | A review runs all five gates. Say which ones ran. |
 | "They asked only about format, but I should check everything" | Answer the question. Offer the other gates. |
 | "The script found nothing, so the gate is clear" | Most logic and honesty defects only show up on reading. |
+| "There is no config, so I cannot say anything yet" | Ask for the school and still report what you can see. Stopping leaves them with nothing the night before. |
+| "A model answer will calm them down" | They will be asked to explain it. Give what the evidence supports, not a script. |
 
 ## Red flags
 
 Stop if you are about to: edit or delete anything in the thesis; write a pass or fail; fill in the student's column; state that the format complies; report a script hit you have not read in context; sign for the student.
+
+## Done when
+
+The report names its basis, every finding has a location and a tag, what was skipped is listed, the student's column is empty, and the reply says this is not an approval.

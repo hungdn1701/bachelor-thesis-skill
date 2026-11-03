@@ -9,7 +9,10 @@
    ```bash
    python evals/make_fixture.py /tmp/evals run1
    python evals/make_fixture.py /tmp/evals --research run2   # scenarios with "fixture": "research"
+   python evals/make_fixture.py /tmp/evals --planned run3    # scenarios with "fixture": "planned"
    ```
+
+   For scenarios with `"fixture": "empty"`, use an empty folder.
 
 2. Start a new agent session in that folder, with the skill available, and send the scenario's `prompt` as written.
 3. Read the transcript and the changed files against `must` and `must_not`.

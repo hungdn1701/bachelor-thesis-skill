@@ -5,14 +5,38 @@
 
 [Tiếng Việt](README.vi.md)
 
-Agent skills for writing and reviewing a bachelor thesis in engineering. They work with Word, LaTeX, Typst and Markdown, and do not assume any particular school.
+Agent skills that take a bachelor thesis in engineering from an idea to submission. The thesis is the product; code, a model, a dataset or a survey is an artifact, the evidence for what the thesis claims. They work with Word, LaTeX, Typst and Markdown, and do not assume any particular school.
 
-| Skill | What it does |
-|---|---|
-| `bachelor-thesis-writing` | Asks for your school, thesis type and language, audits your evidence, and drafts one section at a time from real data |
-| `bachelor-thesis-review` | Reviews a thesis or chapter like a strict advisor, through five gates. It only warns and never edits your text |
+```
+   IDEA         PLAN         WRITE       REVIEW       DEFENSE       FINAL
+┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
+│ Question│─▶│ Claims  │─▶│Sections │─▶│  Five   │─▶│Committee│─▶│Signature│
+│Proposal │  │Evidence │  │ Numbers │  │  gates  │  │Questions│  │Open list│
+└─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘
+   /idea        /plan       /write       /review     /defense      /final
+                  ▲            ▲            │
+                  │            └──── fix ───┘
+            Existing work
+```
 
-You remain the author. These skills help you use AI well; they do not replace your judgment or your advisor's.
+## Steps
+
+| Step | Command | Or just say | What it does |
+|---|---|---|---|
+| Idea | `/idea` | "Refine my thesis idea about ..." | Sharpens your idea into a proposal: the problem, directions, objectives, assumptions, what you will not do. It does not pick a topic for you |
+| Plan | `/plan` | "Plan my thesis from this code and data." | Connects each objective to an artifact, evidence and a section, and lists the gaps |
+| Write | `/write`, `/write auto` | "Write section 5.1 from `data/`." "Write chapter 5 from the plan in one run." | Writes from real evidence and keeps your use of AI on record. Auto runs a chapter of the plan after one clear yes, and stops at what only you can decide |
+| Review | `/review` | "Review chapter 5." | A strict advisor's reading through five gates: honesty, logic, structure, format, style. It only warns and never edits |
+| Defense | `/defense` | "Rehearse my defense on chapter 5." | A committee that tests your claims against your evidence |
+| Final | `/final` | "What is still open before I submit?" | Lists every open item. It never says the thesis is ready |
+
+In Claude Code the commands are `/bachelor-thesis:idea` and so on. Other agents have no commands: just ask.
+
+**Two ways in.** Start at `/idea` if you have an idea or only an interest. Start at `/plan` if your topic is assigned or the work is already done. Either way you end up with the same chain from objective to conclusion, and anything set after measuring is marked as such.
+
+**People decide at two points.** Your advisor decides on the proposal. Before you merge, send a version to your advisor or finalize it, you read the changes and sign `docs/sign-off.md` yourself.
+
+Run reviews in a new session, separate from the one that wrote the text. Building the artifact is up to you and your other tools; for software, [agent-skills](https://github.com/addyosmani/agent-skills) works alongside these.
 
 ## Install
 
@@ -30,42 +54,37 @@ npx skills add hungdn1701/bachelor-thesis-skill
 
 Or copy the folders in `skills/` into your agent's skills directory, such as `.claude/skills/` or `.agents/skills/`. The review script needs Python 3.9 or later; without it, the review continues by reading only.
 
+| Skill | Steps |
+|---|---|
+| `bachelor-thesis-planning` | Idea, Plan |
+| `bachelor-thesis-writing` | Write |
+| `bachelor-thesis-review` | Review, Defense, Final |
+
 ## Supported agents
 
 The skills use the open [Agent Skills](https://agentskills.io) format. They need an agent that can load that format, read and write files in your project, and run commands. Chat apps with no access to a project folder are not a target.
 
 | Status | Agents |
 |---|---|
-| Ran both skills as intended | Claude Code, GitHub Copilot CLI |
-| Ran, but followed the rules only in part | Antigravity CLI |
+| Ran the steps tried so far as intended | Claude Code |
+| Ran writing and review as intended on v0.1 | GitHub Copilot CLI |
+| Ran writing and review, but followed the rules only in part on v0.1 | Antigravity CLI |
 | Loads the skills, not yet run | Gemini CLI (trust the folder first) |
 | Not yet tried | Codex, Cursor and the [other agents the installer lists](https://github.com/vercel-labs/skills/blob/main/docs/agents.md) |
 
 These come from a few runs on fictional projects ([results](evals/RESULTS.md)). Reports from other agents are welcome.
 
-## Use
-
-Ask your agent in plain language, in Vietnamese or English:
-
-- "Help me set up my thesis project."
-- "Draft section 5.1 from the data in `data/`."
-- "Review chapter 5 before I send it to my advisor."
-- "Check my style and format only."
-
-Run the review in a new session, separate from the one that drafted the text. Before you merge, send a version to your advisor or finalize it, read the changes and sign `docs/sign-off.md` yourself.
-
-The skills keep their files in your project: `.thesis/` (school, thesis type, language, format basis), `evidence/claims.csv` (each number and its source), `docs/ai-log.md` (where AI contributed), `docs/gate-record.md` (warnings and your decisions) and `docs/sign-off.md` (what you have read and confirmed).
-
-The review runs five gates: honesty, logic, structure, format and style. Gates only warn, and having no warnings is not an approval: decisions belong to your advisor and committee.
-
 ## What these skills will not do
 
-- Invent numbers, results, citations, signatures or approvals.
-- Draft a whole chapter or thesis in one request.
-- Report results the AI generated as your own measurements.
+- Pick your topic, or invent numbers, results, citations, signatures or approvals.
+- Write your conclusion, or report results the AI generated as your own measurements.
 - Help you evade AI detectors, plant errors to look human, or hide AI use.
-- Tell you that your thesis complies with a school rule.
+- Tell you that your thesis is ready, or that it complies with a school rule.
 - Confirm on your behalf, or merge, tag or send a version you have not signed.
+
+## Files in your project
+
+`docs/proposal.md`, `docs/plan.md` and `docs/decisions.md` (the idea, the chain, the reasons behind each choice), `.thesis/` (school, thesis type, language, format basis), `evidence/claims.csv` (each number and its source), `docs/ai-log.md` (where AI contributed), `docs/gate-record.md` (warnings and your decisions), `docs/defense-notes.md` (rehearsal questions) and `docs/sign-off.md` (what you have read and confirmed).
 
 ## Thesis types and schools
 
@@ -75,7 +94,7 @@ There is no default school. The skill asks for yours, then uses its profile if o
 
 ## About this project
 
-This is a personal contribution by Hung N. Dang (Lecturer & Researcher, PTIT), made first for the students I supervise. I am responsible for the conventions in this repository. It is not a regulation of PTIT or of any other institution. Use it if it helps; nobody is required to. Whether it ever becomes official is a question for later.
+This is a personal contribution by Hung N. Dang (Lecturer & Researcher, PTIT), made first for the students I supervise. I am responsible for the conventions in this repository. It is not a regulation of PTIT or of any other institution. Use it if it helps; nobody is required to. Whether it ever becomes official is a question for later. The lifecycle idea is adapted from [agent-skills](https://github.com/addyosmani/agent-skills), rewritten for theses.
 
 ## Contributing
 
