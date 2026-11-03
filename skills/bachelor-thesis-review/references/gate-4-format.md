@@ -16,7 +16,7 @@ Open the report by naming the basis and its status. A profile is not an official
 
 | Item | How |
 |---|---|
-| Paper, margins, base font and size | Script for `.docx` and PDF. It compares only the values the profile sets; otherwise it lists the actual values for you to report |
+| Paper, margins, base font and size | Script for `.docx` and PDF; the PDF is the only source of these values for Typst and LaTeX. On a PDF it measures the left, right and top margins and the body size, not the bottom margin, where page numbers sit. It compares only the values the profile sets; otherwise it lists the actual values for you to report |
 | Line and paragraph spacing, indents | Inspect the document; a `.docx` may override styles directly |
 | Page numbers: position, style change between front matter and body | Inspect the PDF pages |
 | Cover and title page fields | Compare with the profile. Check that placeholders are gone |

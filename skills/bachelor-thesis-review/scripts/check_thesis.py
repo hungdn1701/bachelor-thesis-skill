@@ -53,6 +53,17 @@ DISCLOSURE_HEADING = re.compile(r"sử dụng ai|công bố ai|tuyên bố.*\bai
 AI_INSTRUCTION = re.compile(
     r"(trợ lý ai|ghi chú cho ai|ai assistant|note to (the )?ai|ignore (all )?previous|đánh giá đạt|mark .{0,30}\bpass)", re.I
 )
+TYP_HEADING_CALL = re.compile(r"#(heading|unnumbered|chapter|section)\b(?:\(([^)]*)\))?\s*\[(.+)\]$")
+TYP_CODE_LINE = re.compile(r"#(import|include|show|set|let|outline|pagebreak|counter|v|h|bibliography)\b")
+INCLUDES = {
+    ".typ": re.compile(r'#include\s+"([^"]+)"'),
+    ".tex": re.compile(r"\\(?:input|include)\{([^}]+)\}"),
+}
+TYP_CITE = re.compile(r"(?<![\w.@/])@([A-Za-z][\w:-]*(?:\.[\w:-]+)*)|#cite\(<([\w:.-]+)>")
+TYP_LABEL = re.compile(r"(?<![\w<])<([A-Za-z][\w:.-]*)>")
+TEX_CITE = re.compile(r"\\[a-zA-Z]*cite[a-zA-Z]*\*?(?:\[[^\]]*\])*\{([^}]+)\}")
+BIB_KEY = re.compile(r"^\s*@\w+\s*\{\s*([^,\s]+)\s*,", re.M)
+SKIPPED_FOLDERS = {".git", ".claude", ".agents", ".thesis", "node_modules", "dist", "__pycache__"}
 MISSING_MARKER = re.compile(r"\[(MISSING|THIẾU)\b[^\]]*\]|\b(TODO|FIXME|TBD)\b")
 LOCAL_FORMATTING = re.compile(r"\*\*[^*\n]+\*\*|^\s{0,3}#{2,}\s")
 
@@ -121,12 +132,18 @@ def parse_text(rel, raw):
             lines.append(Line(number, text, "comment"))
             in_comment = (in_comment or "<!--" in stripped) and "-->" not in stripped
             continue
+        if ext == ".typ" and (in_comment or stripped.startswith("/*")):
+            lines.append(Line(number, text, "comment"))
+            in_comment = (in_comment or stripped.startswith("/*")) and "*/" not in stripped
+            continue
         if (ext == ".typ" and stripped.startswith("//")) or (ext == ".tex" and stripped.startswith("%")):
             lines.append(Line(number, text, "comment"))
             continue
         level, title = heading_of(ext, stripped)
         if level:
             lines.append(Line(number, title, "heading", level))
+        elif ext == ".typ" and TYP_CODE_LINE.match(stripped):
+            lines.append(Line(number, text, "code"))
         else:
             lines.append(Line(number, text, "text"))
     return mark_sections(lines)
@@ -136,7 +153,13 @@ def heading_of(ext, stripped):
     if ext == ".md":
         match = re.match(r"(#{1,6})\s+(.*)", stripped)
     elif ext == ".typ":
-        match = re.match(r"(={1,6})\s+(.*)", stripped)
+        if stripped.startswith("#bibliography"):
+            return 1, "Tài liệu tham khảo / References"
+        call = TYP_HEADING_CALL.match(stripped)
+        if call:
+            level = re.search(r"level:\s*(\d)", call.group(2) or "")
+            return (int(level.group(1)) if level else 1), call.group(3)
+        match = re.match(r"(={1,6})\s+(.*?)(?:\s*<[\w:.-]+>)?$", stripped)
     elif ext == ".tex":
         tex = re.match(r"\\(chapter|section|subsection|subsubsection)\*?\{(.*)\}", stripped)
         if tex:
@@ -214,6 +237,51 @@ def load_document(root, rel):
         return parse_docx(rel, path)
     with open(path, encoding="utf-8", errors="replace") as handle:
         return Document(rel, parse_text(rel, handle.read()), {})
+
+
+def expand_sources(root, sources):
+    """Lists the given files and everything they include, parents first."""
+    found = []
+
+    def visit(rel):
+        rel = rel.replace("\\", "/")
+        path = os.path.join(root, rel)
+        if rel in found or not os.path.isfile(path):
+            return
+        found.append(rel)
+        ext = os.path.splitext(rel)[1].lower()
+        pattern = INCLUDES.get(ext)
+        if pattern is None:
+            return
+        with open(path, encoding="utf-8", errors="replace") as handle:
+            lines = [line for line in handle if not line.lstrip().startswith(("//", "%"))]
+        for target in pattern.findall("".join(lines)):
+            if ext == ".tex" and not target.endswith(".tex"):
+                target += ".tex"
+            if target.startswith("/"):
+                visit(target.lstrip("/"))
+            else:
+                visit(os.path.normpath(os.path.join(os.path.dirname(rel), target)))
+
+    for source in sources:
+        visit(source)
+    return found
+
+
+def project_files(root, extension):
+    for base, folders, names in os.walk(root):
+        folders[:] = [name for name in folders if name not in SKIPPED_FOLDERS]
+        for name in names:
+            if name.lower().endswith(extension):
+                yield os.path.join(base, name)
+
+
+def read_all(paths):
+    texts = []
+    for path in paths:
+        with open(path, encoding="utf-8", errors="replace") as handle:
+            texts.append(handle.read())
+    return texts
 
 
 def term_pattern(term):
@@ -301,10 +369,10 @@ def check_markers_and_instructions(doc):
     return findings
 
 
-def check_citations(docs, scope="partial"):
+def check_citations(docs, scope="partial", bibliography=""):
     findings = []
     entries = {}
-    reference_text = []
+    reference_text = [bibliography]
     for doc in docs:
         for line in doc.lines:
             if line.kind == "reference":
@@ -335,6 +403,39 @@ def check_citations(docs, scope="partial"):
     for doc, line, author, year in named:
         if not (author.lower() in joined.lower() and year in joined):
             findings.append(Finding("honesty", "high", where(doc, line), f"Trích dẫn '{author} ({year})' không có trong danh mục; cần kiểm tra tài liệu có thật không."))
+    return findings
+
+
+def strip_raw(text):
+    return re.sub(r"`[^`]*`", "", text)
+
+
+def check_cite_keys(root, docs):
+    """Citations and cross-references in Typst and LaTeX resolve through keys, not numbers."""
+    keys = set(BIB_KEY.findall("\n".join(read_all(project_files(root, ".bib")))))
+    typst = [strip_raw(text) for text in read_all(project_files(root, ".typ"))]
+    labels = {label for text in typst for label in TYP_LABEL.findall(text)}
+    used = {a or b for text in typst for a, b in TYP_CITE.findall(text)}
+    findings = []
+    for doc in docs:
+        ext = os.path.splitext(doc.rel)[1].lower()
+        if ext not in (".typ", ".tex"):
+            continue
+        for line in doc.lines:
+            if line.kind not in ("text", "heading"):
+                continue
+            text = strip_raw(line.text)
+            if ext == ".typ":
+                cited = [a or b for a, b in TYP_CITE.findall(text)]
+                if line.text.lstrip().startswith(")"):
+                    for label in TYP_LABEL.findall(text):
+                        if label not in used:
+                            findings.append(Finding("structure", "medium", where(doc, line), f"Hình hoặc bảng có nhãn <{label}> nhưng văn bản không dẫn tới."))
+            else:
+                cited = [key.strip() for group in TEX_CITE.findall(text) for key in group.split(",")]
+            for key in cited:
+                if key not in keys and key not in labels:
+                    findings.append(Finding("honesty", "high", where(doc, line), f"Tham chiếu '{key}' không có nhãn hay mục nào trong tệp .bib; kiểm tra nguồn."))
     return findings
 
 
@@ -370,11 +471,18 @@ def check_figures(docs):
     findings = []
     captions = {}
     mentions = {}
+    # Typst and LaTeX number figures themselves, so a written number has no caption to match.
+    automatic = any(
+        marker in line.text
+        for doc in docs
+        for line in doc.lines
+        for marker in ("#figure(", "\\begin{figure", "\\begin{table")
+    )
     for doc in docs:
         for line in doc.lines:
             if line.kind not in ("text",):
                 continue
-            caption = CAPTION.match(line.text)
+            caption = None if automatic else CAPTION.match(line.text)
             if caption:
                 key = f"{caption.group(1).capitalize()} {caption.group(2)}"
                 captions.setdefault(key, where(doc, line))
@@ -385,7 +493,9 @@ def check_figures(docs):
                 key = f"{match.group(1).capitalize()} {match.group(2)}"
                 mentions.setdefault(key, where(doc, line))
     for key, location in sorted(mentions.items()):
-        if key not in captions:
+        if key not in captions and automatic:
+            findings.append(Finding("structure", "low", location, f"{key} được viết bằng số cố định; dùng tham chiếu nhãn để số không lệch khi thêm hình."))
+        elif key not in captions:
             findings.append(Finding("structure", "high", location, f"Văn bản nhắc tới {key} nhưng không có chú thích hình/bảng này."))
     for key, location in sorted(captions.items()):
         if key not in mentions:
@@ -500,6 +610,48 @@ def check_pdf(root, config, profile):
         names = {entry[3].split("+")[-1].lower() for page in document for entry in page.get_fonts()}
         if names and not any(wanted in name for name in names):
             findings.append(Finding("format", "medium", rel, f"PDF không nhúng phông {font}."))
+    findings += check_pdf_layout(document, rel, profile)
+    return findings
+
+
+def median(values):
+    ordered = sorted(values)
+    return ordered[len(ordered) // 2]
+
+
+def check_pdf_layout(document, rel, profile):
+    """Measures body pages. The bottom margin is skipped because page numbers sit inside it."""
+    margins = profile.get("margins_cm") or {}
+    size = profile.get("size_pt")
+    tolerance = profile.get("tolerance_cm", 0.2)
+    measured = {"left": [], "right": [], "top": []}
+    sizes = {}
+    for page in document:
+        spans = [
+            span
+            for block in page.get_text("dict")["blocks"]
+            for line in block.get("lines", [])
+            for span in line["spans"]
+            if span["text"].strip()
+        ]
+        for span in spans:
+            key = round(span["size"], 1)
+            sizes[key] = sizes.get(key, 0) + len(span["text"])
+        if len({round(span["bbox"][1]) for span in spans}) < 10:
+            continue  # a cover, or a page too short to show the text area
+        measured["left"].append(min(span["bbox"][0] for span in spans))
+        measured["right"].append(page.rect.width - max(span["bbox"][2] for span in spans))
+        measured["top"].append(min(span["bbox"][1] for span in spans))
+    findings = []
+    for side, values in measured.items():
+        if side in margins and values:
+            actual = median(values) / 28.3465
+            if abs(actual - margins[side]) > tolerance:
+                findings.append(Finding("format", "medium", rel, f"Lề {side} trong PDF khoảng {actual:.1f} cm, hồ sơ ghi {margins[side]} cm."))
+    if size and sizes:
+        body = max(sizes, key=sizes.get)
+        if abs(body - size) > 0.5:
+            findings.append(Finding("format", "medium", rel, f"Cỡ chữ thân bài trong PDF khoảng {body} pt, hồ sơ ghi {size} pt."))
     return findings
 
 
@@ -519,7 +671,7 @@ def load_profile(root, config):
 def run_checks(root, config):
     profile = load_profile(root, config)
     terms = load_terms(config.get("language", "vi"))
-    docs = [load_document(root, rel) for rel in config.get("sources", []) if os.path.exists(os.path.join(root, rel))]
+    docs = [load_document(root, rel) for rel in expand_sources(root, config.get("sources", []))]
     findings, rows = check_claims(root, config)
     findings += check_ai_log(root, config)
     known = claim_numbers(rows)
@@ -530,7 +682,9 @@ def run_checks(root, config):
         findings += check_heading_tree(doc)
         findings += check_style(doc, terms)
         findings += check_geometry(doc, profile)
-    findings += check_citations(docs, config.get("scope", "partial"))
+    bibliography = "\n".join(read_all(project_files(root, ".bib")))
+    findings += check_citations(docs, config.get("scope", "partial"), bibliography)
+    findings += check_cite_keys(root, docs)
     findings += check_figures(docs)
     findings += check_required_parts(docs, config)
     findings += check_pdf(root, config, profile)
