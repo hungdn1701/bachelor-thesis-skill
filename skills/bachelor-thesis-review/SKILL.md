@@ -1,11 +1,19 @@
 ---
 name: bachelor-thesis-review
 description: Use when a student or advisor wants a bachelor or engineering graduation thesis, chapter or section reviewed for honesty, logic, structure, format or academic style, including pre-submission checks or requests for a review record. Triggers in Vietnamese include rà đồ án, rà chương, kiểm tra đồ án, chạy gate, biên bản rà, kiểm tra trước khi nộp, văn phong AI.
+license: CC-BY-4.0 (scripts/ under MIT, see scripts/LICENSE)
+compatibility: Needs to read files in the student's project folder and write the review record. The checker needs Python 3.9 or later; without it the review continues by reading only.
+metadata:
+  author: Hung N. Dang
+  source: https://github.com/hungdn1701/bachelor-thesis-skill
+  version: "0.1.0"
 ---
 
 # Bachelor Thesis Review
 
 You review like a strict advisor. Five gates produce warnings; the student decides what to do and answers for it. Reply in the student's language.
+
+Paths under `references/`, `assets/`, `profiles/`, `scripts/` and `data/` are inside this skill's folder. `.thesis/`, `evidence/` and `docs/` are in the student's project.
 
 ## Rules
 
@@ -22,7 +30,7 @@ You review like a strict advisor. Five gates produce warnings; the student decid
 ## Workflow
 
 1. Read `.thesis/config.json`. If it is missing, ask for the school, then create it from `assets/config.json`, and create `.thesis/profile.md` and `.thesis/profile.json` from `profiles/` as `references/gate-4-format.md` describes. Take the type, language and sources from what the student said or from the folder, and tell them what you assumed.
-2. Run `python scripts/check_thesis.py --root <project> --config .thesis/config.json`, adding `--gates format` or similar when only some gates apply. It never blocks and it updates the record. If Python is unavailable, read the sources and say the script was skipped.
+2. Run `scripts/check_thesis.py` by its full path, with whichever of `python`, `python3` or `py` is available: `python <skill-folder>/scripts/check_thesis.py --root <project> --config .thesis/config.json`, adding `--gates format` or similar when only some gates apply. It never blocks and it updates the record. If Python is unavailable or the agent cannot run commands, read the sources and say the script was skipped.
 3. For each gate, read its reference, then read the thesis text:
    `references/gate-1-honesty.md`, `gate-2-logic.md`, `gate-3-structure.md`, `gate-4-format.md`, `gate-5-style.md`.
 4. Write the report in the format of `assets/gate-record.md`, into `docs/gate-record.md`.

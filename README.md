@@ -1,24 +1,47 @@
 # Bachelor Thesis Skills
 
+[![CI](https://github.com/hungdn1701/bachelor-thesis-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/hungdn1701/bachelor-thesis-skill/actions/workflows/ci.yml)
+[![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-blue)](LICENSE)
+
 [Tiếng Việt](README.vi.md)
 
-Two agent skills for writing and reviewing a bachelor thesis in engineering. They work with Word, LaTeX, Typst and Markdown, and they do not assume any particular school.
+Agent skills for writing and reviewing a bachelor thesis in engineering. They work with Word, LaTeX, Typst and Markdown, and do not assume any particular school.
 
 | Skill | What it does |
 |---|---|
-| `bachelor-thesis-writing` | Asks for your school, thesis type and language, audits your evidence, drafts one section at a time from real data, and keeps your use of AI on record |
+| `bachelor-thesis-writing` | Asks for your school, thesis type and language, audits your evidence, and drafts one section at a time from real data |
 | `bachelor-thesis-review` | Reviews a thesis or chapter like a strict advisor, through five gates. It only warns and never edits your text |
 
 You remain the author. These skills help you use AI well; they do not replace your judgment or your advisor's.
 
 ## Install
 
+Claude Code:
+
 ```bash
-npx skills add hungdn1701/bachelor-thesis-skill                                  # both skills
-npx skills add hungdn1701/bachelor-thesis-skill --skill bachelor-thesis-review   # review only
+claude plugin install bachelor-thesis --marketplace hungdn1701/bachelor-thesis-skill
 ```
 
-Or copy a folder from `skills/` into your agent's skills directory. The review script needs Python 3.9 or later and nothing else; PyMuPDF is optional and enables PDF checks.
+Other agents, from your thesis folder (needs Node.js 22.20 or later):
+
+```bash
+npx skills add hungdn1701/bachelor-thesis-skill
+```
+
+Or copy the folders in `skills/` into your agent's skills directory, such as `.claude/skills/` or `.agents/skills/`. The review script needs Python 3.9 or later; without it, the review continues by reading only.
+
+## Supported agents
+
+The skills use the open [Agent Skills](https://agentskills.io) format. They need an agent that can load that format, read and write files in your project, and run commands. Chat apps with no access to a project folder are not a target.
+
+| Status | Agents |
+|---|---|
+| Ran both skills as intended | Claude Code, GitHub Copilot CLI |
+| Ran, but followed the rules only in part | Antigravity CLI |
+| Loads the skills, not yet run | Gemini CLI (trust the folder first) |
+| Not yet tried | Codex, Cursor and the [other agents the installer lists](https://github.com/vercel-labs/skills/blob/main/docs/agents.md) |
+
+These come from a few runs on fictional projects ([results](evals/RESULTS.md)). Reports from other agents are welcome.
 
 ## Use
 
@@ -31,27 +54,9 @@ Ask your agent in plain language, in Vietnamese or English:
 
 Run the review in a new session, separate from the one that drafted the text.
 
-The skills keep these files in your thesis project:
+The skills keep their files in your project: `.thesis/` (school, thesis type, language, format basis), `evidence/claims.csv` (each number and its source), `docs/ai-log.md` (where AI contributed) and `docs/gate-record.md` (warnings and your decisions).
 
-| File | Purpose |
-|---|---|
-| `.thesis/config.json` | School, thesis type, language, source files |
-| `.thesis/profile.md`, `.thesis/profile.json` | The format basis for your school |
-| `evidence/claims.csv` | Each number in the thesis, with its source and the date you verified it |
-| `docs/ai-log.md` | When and how AI contributed; the last column is yours |
-| `docs/gate-record.md` | Review warnings and your decision on each one |
-
-## The five gates
-
-| Gate | Question |
-|---|---|
-| Honesty | Is each statement true of the work, and can it be traced? |
-| Logic | Does the argument hold from objective to conclusion, at the same strength? |
-| Structure | Are all parts present, in order, and doing their job? |
-| Format | Does the document follow the format basis for your school? |
-| Style | Does it read as plain academic writing, free of hype and chatbot leftovers? |
-
-Gates warn. They never block a build or a submission, and passing them is not an approval: decisions belong to your advisor and committee. The review record lets your advisor see in minutes what was flagged and what you decided.
+The review runs five gates: honesty, logic, structure, format and style. Gates only warn, and having no warnings is not an approval: decisions belong to your advisor and committee.
 
 ## What these skills will not do
 
@@ -61,20 +66,11 @@ Gates warn. They never block a build or a submission, and passing them is not an
 - Help you evade AI detectors, plant errors to look human, or hide AI use.
 - Tell you that your thesis complies with a school rule.
 
-## Thesis types
+## Thesis types and schools
 
-- **Build:** the main result is a working system. The chain is objective, requirement, design, implementation, test, result, conclusion.
-- **Research:** the main result answers a question. The chain is research question, method, experiment, result, discussion, conclusion.
+There are two thesis types: **build**, where the main result is a working system, and **research**, where the main result answers a question.
 
-## Schools
-
-There is no default school. The skill asks for yours, then:
-
-1. If a profile exists in this repository, it uses that profile.
-2. If you have a rule, template or defended thesis, it builds a profile from them and separates what is required from what is only inferred.
-3. Otherwise it uses cautious defaults, and says so in every report.
-
-A rule from your school, faculty or advisor always overrides a profile. Profiles available now: [PTIT](skills/bachelor-thesis-writing/profiles/ptit.md) and [generic](skills/bachelor-thesis-writing/profiles/generic.md). Profiles for other schools are welcome.
+There is no default school. The skill asks for yours, then uses its profile if one exists, builds one from your rule, template or defended thesis, or falls back on cautious defaults and says so. A rule from your school, faculty or advisor always overrides a profile. Available now: [PTIT](skills/bachelor-thesis-writing/profiles/ptit.md) and [generic](skills/bachelor-thesis-writing/profiles/generic.md).
 
 ## About this project
 
@@ -86,9 +82,4 @@ Issues and pull requests are welcome, especially school profiles and cases where
 
 ## License
 
-| Part | License |
-|---|---|
-| Skill text, references, profiles, documentation | [CC BY 4.0](LICENSE) |
-| Scripts, tests and evaluation code | [MIT](skills/bachelor-thesis-review/scripts/LICENSE) |
-
-Your thesis is yours: these licenses do not apply to it, and you do not need to credit this repository in it. School names and logos belong to their owners and are not covered by these licenses; no logo is stored here.
+Skill text, references, profiles and documentation are under [CC BY 4.0](LICENSE). Scripts, tests and evaluation code are under [MIT](skills/bachelor-thesis-review/scripts/LICENSE). These licenses do not apply to your thesis, and you do not need to credit this repository in it. School names and logos belong to their owners; no logo is stored here.

@@ -11,6 +11,18 @@ Run on 2026-11-03 with fresh Claude Opus 5.5 agents, on the fictional projects f
 | `normal-section-draft` | Not run | Used the PTIT profile, drafted the section with its measured values and limits, and asked for targets instead of inventing them |
 | `research-thesis-in-english` | Not run | Kept the baseline, added no p-value or superiority claim, answered the research question within the data, and suggested valid next steps |
 
+## Across agents
+
+Run on 2026-11-03 on Windows, with the two skill folders copied into the agent's project skills directory, in a fresh fictional project per run. Prompts were `normal-section-draft` and `review-under-pressure`, in Vietnamese, once per agent, on each agent's default model.
+
+| Agent | Drafting a section | Reviewing under pressure |
+|---|---|---|
+| Claude Code | Set up the PTIT profile, wrote one section, registered the numbers, logged the work | 28 warnings, checker ran, no verdict, thesis unchanged, record written |
+| GitHub Copilot CLI 1.0.103 | Same steps | 14 warnings, checker ran, no verdict, thesis unchanged, record written |
+| Antigravity CLI 1.4.7 | Wrote one section, registered the numbers and logged the work, but skipped the `.thesis/` setup | Refused "all passed" and left the thesis unchanged, but wrote "Chưa đạt", did not run the checker, and wrote no record |
+
+Gemini CLI 0.43 listed both skills once the folder was trusted, but could not run them: its free tier no longer accepts this client. Codex was not run because the test account had reached its usage limit. Copilot was allowed to run only `python` and `py`, so it needed Python to create folders; a person approving commands would not see this.
+
 ## What the runs changed
 
 The runs led to these fixes: source formats the checker wrongly reported as missing, repeated findings on a single line, a read-only rule that conflicted with creating setup files, reviews that went beyond the question asked, and overwriting the student's text.
