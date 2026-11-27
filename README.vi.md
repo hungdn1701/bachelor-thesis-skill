@@ -3,6 +3,7 @@
 [![CI](https://github.com/hungdn1701/bachelor-thesis-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/hungdn1701/bachelor-thesis-skill/actions/workflows/ci.yml)
 [![License: CC BY 4.0](https://img.shields.io/badge/license-CC%20BY%204.0-blue)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/format-Agent%20Skills-555)](https://agentskills.io)
+[![skills.sh](https://skills.sh/b/hungdn1701/bachelor-thesis-skill)](https://skills.sh/hungdn1701/bachelor-thesis-skill)
 
 [English](README.md)
 
