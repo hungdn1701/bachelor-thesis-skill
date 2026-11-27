@@ -1,0 +1,31 @@
+name: Idea or missing step / Đề xuất, bước còn thiếu
+description: Something you wanted the skills to do, or a rule that would have saved you work. / Việc bạn muốn skill làm được, hoặc một quy tắc lẽ ra giúp bạn đỡ công.
+labels: [idea]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This tracker is public: describe the need with made-up examples, not your thesis.
+        Repo này công khai: mô tả nhu cầu bằng ví dụ giả định, không chép đồ án.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help / Điều gì sẽ giúp ích
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: What you do now instead / Hiện bạn đang làm thế nào
+      description: The manual fix or the extra step it would replace. / Cách sửa tay hay bước thêm mà đề xuất này thay được.
+  - type: input
+    id: version
+    attributes:
+      label: Skill version / Phiên bản skill
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before sending / Trước khi gửi
+      options:
+        - label: This holds no thesis text, names or data. / Không có nội dung đồ án, tên người hay số liệu.
+          required: true

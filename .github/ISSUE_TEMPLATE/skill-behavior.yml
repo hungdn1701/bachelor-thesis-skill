@@ -1,22 +1,71 @@
 name: Skill behavior / Hành vi của skill
-description: A skill or the checker did something wrong or unhelpful. / Skill hoặc script làm sai hoặc chưa hữu ích.
+description: A skill or the checker did something wrong, unhelpful or unexpected. / Skill hoặc script làm sai, chưa hữu ích hoặc khác mong đợi.
 labels: [behavior]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        This tracker is public. Describe what the skill did, not your thesis: no thesis text, names, data, topics or internal system names. Replace them with made-up ones.
+        Repo này công khai. Hãy mô tả việc skill đã làm, không chép đồ án: không đưa nội dung, tên người, số liệu, đề tài hay tên hệ thống nội bộ; thay bằng ví dụ giả định.
+
+        Your agent can draft this for you: ask it to "report a problem with the thesis skills", or run `/bachelor-thesis:feedback` in Claude Code.
+        Agent có thể soạn giúp: nói "báo lỗi bộ skill đồ án", hoặc gõ `/bachelor-thesis:feedback` trên Claude Code.
+  - type: textarea
+    id: summary
+    attributes:
+      label: In your own words / Bằng lời của bạn
+      description: Two or three sentences, written by you, not the agent. / Hai, ba câu do chính bạn viết, không phải agent.
+    validations:
+      required: true
   - type: dropdown
     id: skill
     attributes:
       label: Skill
       options:
+        - bachelor-thesis-planning
         - bachelor-thesis-writing
         - bachelor-thesis-review
         - check_thesis.py
+        - Not sure / Không rõ
+    validations:
+      required: true
+  - type: dropdown
+    id: step
+    attributes:
+      label: Step / Bước
+      options:
+        - setup
+        - idea
+        - plan
+        - write (one section / một mục)
+        - write auto (a chapter / một chương)
+        - write all (whole thesis / cả quyển)
+        - review
+        - defense
+        - final
+        - sign-off, merge, send / ký, gộp, gửi
+        - other / khác
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Skill version / Phiên bản skill
+      description: "`version` under `metadata` in the skill's SKILL.md, for example 0.3.1. / Dòng `version` trong SKILL.md của skill."
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Agent, version and model / Agent, phiên bản và model
+      placeholder: Claude Code 2.1, Claude Opus 5.5
     validations:
       required: true
   - type: textarea
     id: request
     attributes:
       label: What was asked / Yêu cầu là gì
-      description: Use made-up thesis content. / Hãy dùng nội dung đồ án giả định.
+      description: The request, with made-up thesis content. / Yêu cầu đã gửi, với nội dung đồ án giả định.
     validations:
       required: true
   - type: textarea
@@ -31,7 +80,22 @@ body:
       label: What you expected / Mong đợi điều gì
     validations:
       required: true
-  - type: input
-    id: tool
+  - type: dropdown
+    id: severity
     attributes:
-      label: AI tool and version / Công cụ AI và phiên bản
+      label: Severity / Mức độ
+      options:
+        - blocks the work / chặn việc
+        - annoying / phiền
+        - minor / nhỏ
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before sending / Trước khi gửi
+      options:
+        - label: This report holds no thesis text, names, data or internal system names. / Báo cáo không có nội dung đồ án, tên người, số liệu hay tên hệ thống nội bộ.
+          required: true
+        - label: I searched the open and closed issues. / Đã tìm trong các issue đang mở và đã đóng.
+          required: true

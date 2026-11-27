@@ -55,6 +55,14 @@ Run on 2026-11-26 and 2026-11-27 with fresh Claude Opus 5.5 sessions (`claude -p
 
 The same review request also ran on the real thesis, at a commit the students later fixed by hand, once with each version, on a local copy; nothing from that thesis is kept here. v0.2 found 27 warnings, among them the unmeasured sentence in the conclusion, as `medium`. v0.3 found 28: it reported first that no review had ever covered the whole thesis and that more than a hundred commits had changed it since the last review in a new session, noticed that old sign-off rows had been overwritten, and rated the conclusion sentence `high` in its map of the conclusion. Neither version caught a status label the text misread, because the code that sets it lives in a repository the review could not open, and neither flagged the limit repeated in several sections.
 
+## Feedback to the authors (v0.3.1)
+
+Run on 2026-11-27, once before and once after, as above.
+
+| Scenario | v0.3.0 | v0.3.1 |
+|---|---|---|
+| `report-skill-problem` | Loaded no skill, but found the repository in the skill's metadata and drafted an issue without the student's, advisor's or thesis's names; it did not follow the form, did not ask for the student's own summary, and offered to post it with `gh` once the student agreed | Loaded the review skill: the form's fields with the skill, step, version and agent; made-up examples in place of the names; three questions, one asking for the summary in the student's own words; a filled-in form link promised once the student agrees with the final text, with the student submitting it |
+
 ## What the runs changed
 
 The runs led to these fixes: source formats the checker wrongly reported as missing, repeated findings on a single line, a read-only rule that conflicted with creating setup files, reviews that went beyond the question asked, and overwriting the student's text. The v0.2 runs led to wider skill descriptions, because a request to write a whole chapter did not load the writing skill; a clear rule to commit after each section, even in a shared file; a narrower rule for stopping a run, because a small mismatch in one section had stopped a whole chapter; and treating a plan approved in the request as the required yes, because a run had stopped to ask again.

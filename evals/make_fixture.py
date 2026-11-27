@@ -311,7 +311,7 @@ if __name__ == "__main__":
     builders = {"--research": build_research, "--planned": build_planned, "--group": build_group, "--reviewed": build_reviewed}
     builder = next((builders[flag] for flag in builders if flag in names), build)
     for name in names:
-        if name.startswith("--"):
+        if not name or name.startswith("--"):
             continue
         target = os.path.join(base, name)
         shutil.rmtree(target, ignore_errors=True)
