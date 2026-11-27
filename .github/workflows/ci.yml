@@ -13,7 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        # ubuntu-latest moved to 26.04, which has no Python 3.9 build; the skills still promise 3.9.
+        os: [ubuntu-24.04, windows-latest]
         python: ["3.9", "3.12"]
     steps:
       - uses: actions/checkout@v5
