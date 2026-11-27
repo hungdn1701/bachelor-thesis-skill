@@ -10,7 +10,7 @@
       "description": "From an idea to a submitted thesis: refine the idea, plan the claims, write from real evidence, review through five gates, rehearse the defense and check the final version",
       "source": "./",
       "strict": false,
-      "version": "0.3.0",
+      "version": "0.3.1",
       "license": "CC-BY-4.0",
       "repository": "https://github.com/hungdn1701/bachelor-thesis-skill",
       "skills": [

@@ -20,7 +20,7 @@ Issues and pull requests are welcome. The most useful contributions are school p
 
 ## Report a skill behaving badly
 
-Use the issue template. Include the request, what the skill did, and what you expected. Use made-up thesis content.
+Use the issue form, or ask your agent to "report a problem with the thesis skills" (`/bachelor-thesis:feedback` in Claude Code) and submit the link it gives you. Include the skill and step, the skill version, your agent, the request, what the skill did, and what you expected. Use made-up thesis content.
 
 ## Change a skill
 

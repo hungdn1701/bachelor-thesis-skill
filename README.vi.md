@@ -35,7 +35,7 @@ claude plugin install bachelor-thesis --marketplace hungdn1701/bachelor-thesis-s
 
 **Chép tay.** Chép các thư mục trong `skills/` vào thư mục skill của agent, ví dụ `.claude/skills/` hay `.agents/skills/`. Mỗi thư mục dùng được độc lập.
 
-Script rà cần Python 3.9 trở lên; nếu không có Python, việc rà vẫn tiếp tục bằng cách đọc văn bản. Sau đó chỉ cần nói việc cần làm, ví dụ "Lập kế hoạch đồ án từ code và dữ liệu này."
+Script rà cần Python 3.9 trở lên; nếu không có Python, việc rà vẫn tiếp tục bằng cách đọc văn bản. Sau đó chỉ cần nói việc cần làm, ví dụ "Lập kế hoạch đồ án từ code và dữ liệu này." Khi skill làm chưa đúng, xem mục [Phản hồi](#phản-hồi).
 
 ## Các skill
 
@@ -43,7 +43,7 @@ Script rà cần Python 3.9 trở lên; nếu không có Python, việc rà vẫ
 |---|---|---|
 | [`bachelor-thesis-planning`](skills/bachelor-thesis-planning/SKILL.md) | Làm rõ ý tưởng thành đề cương, nối từng mục tiêu với artifact, bằng chứng và mục viết | Ý tưởng, Kế hoạch |
 | [`bachelor-thesis-writing`](skills/bachelor-thesis-writing/SKILL.md) | Viết từng mục, một chương hay cả quyển từ bằng chứng thật, ghi lại phần AI tham gia | Viết |
-| [`bachelor-thesis-review`](skills/bachelor-thesis-review/SKILL.md) | Rà qua năm gate, luyện bảo vệ, liệt kê việc còn mở trước khi nộp | Rà, Bảo vệ, Bản cuối |
+| [`bachelor-thesis-review`](skills/bachelor-thesis-review/SKILL.md) | Rà qua năm gate, luyện bảo vệ, liệt kê việc còn mở trước khi nộp, và giúp báo lỗi bộ skill | Rà, Bảo vệ, Bản cuối, Phản hồi |
 
 ## Cách hoạt động
 
@@ -124,7 +124,7 @@ skills/
   bachelor-thesis-planning/   SKILL.md, references/, assets/
   bachelor-thesis-writing/    SKILL.md, references/, assets/, profiles/
   bachelor-thesis-review/     SKILL.md, references/, assets/, profiles/, scripts/, data/
-commands/                     /idea, /plan, /write, /review, /defense, /final cho Claude Code
+commands/                     /idea, /plan, /write, /review, /defense, /final, /feedback cho Claude Code
 evals/                        kịch bản gây áp lực, công cụ dựng dự án giả tưởng, kết quả
 tests/                        kiểm tra script rà và repo
 .claude-plugin/               marketplace cho Claude Code
@@ -137,6 +137,15 @@ Mỗi thay đổi ở skill đi kèm một kịch bản trong [`evals/scenarios.
 ## Về dự án này
 
 Đây là đóng góp cá nhân của tôi, Đặng Ngọc Hùng (giảng viên, PTIT), trước hết để hỗ trợ sinh viên nhóm tôi hướng dẫn. Tôi chịu trách nhiệm về các quy ước trong repo. Repo không phải văn bản của PTIT hay bất kỳ đơn vị nào. Ai thấy phù hợp thì dùng, không bắt buộc. Sau này có trở thành chính thức hay không sẽ tính sau. Ý tưởng về vòng đời được phỏng theo [agent-skills](https://github.com/addyosmani/agent-skills) và viết lại cho đồ án.
+
+## Phản hồi
+
+Bộ skill được cải thiện nhờ phản hồi từ các đồ án thật. Khi skill làm sai, chưa hữu ích hoặc còn thiếu một bước, có hai cách báo:
+
+1. **Nhờ agent.** Nói "báo lỗi bộ skill đồ án", hoặc gõ `/feedback` (trên Claude Code là `/bachelor-thesis:feedback`). Agent soạn báo cáo từ phiên làm việc nhưng không chép nội dung đồ án, hỏi sinh viên vài câu bằng lời của mình, rồi đưa một đường link mở sẵn biểu mẫu đã điền. Không có gì được gửi đi cho tới khi sinh viên tự bấm gửi bằng tài khoản GitHub của mình.
+2. **Hoặc tự mở biểu mẫu:** [skill làm sai](https://github.com/hungdn1701/bachelor-thesis-skill/issues/new?template=skill-behavior.yml), [đề xuất, bước còn thiếu](https://github.com/hungdn1701/bachelor-thesis-skill/issues/new?template=idea.yml), hoặc [quy định trình bày của một trường](https://github.com/hungdn1701/bachelor-thesis-skill/issues/new?template=school-profile.yml).
+
+Một báo cáo hữu ích ghi rõ skill và bước, phiên bản skill (dòng `version` trong `SKILL.md` của skill đó), agent và model, yêu cầu đã gửi, skill đã làm gì và mong đợi điều gì. Repo công khai: không đưa nội dung đồ án, tên người, số liệu, đề tài hay tên hệ thống nội bộ, mà dùng ví dụ giả định. Nếu giảng viên tổ chức dùng thử và có phiếu phản hồi trong dự án, ghi thêm vào phiếu đó.
 
 ## Đóng góp
 

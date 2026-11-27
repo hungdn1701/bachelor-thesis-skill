@@ -20,7 +20,7 @@ Rất mong nhận issue và pull request. Hữu ích nhất là hồ sơ trườ
 
 ## Báo skill xử lý chưa tốt
 
-Dùng mẫu issue. Ghi yêu cầu, skill đã làm gì và mong đợi điều gì. Hãy dùng nội dung đồ án giả định.
+Dùng biểu mẫu issue, hoặc nhờ agent "báo lỗi bộ skill đồ án" (trên Claude Code là `/bachelor-thesis:feedback`) rồi gửi đường link nó đưa. Ghi skill và bước, phiên bản skill, agent, yêu cầu, skill đã làm gì và mong đợi điều gì. Hãy dùng nội dung đồ án giả định.
 
 ## Sửa skill
 

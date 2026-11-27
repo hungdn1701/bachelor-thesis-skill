@@ -35,7 +35,7 @@ claude plugin install bachelor-thesis --marketplace hungdn1701/bachelor-thesis-s
 
 **By hand.** Copy the folders in `skills/` into your agent's skills directory, such as `.claude/skills/` or `.agents/skills/`. Each folder works on its own.
 
-The review script needs Python 3.9 or later; without it, the review continues by reading only. Then say what you need, for example "Plan my thesis from this code and data."
+The review script needs Python 3.9 or later; without it, the review continues by reading only. Then say what you need, for example "Plan my thesis from this code and data." If a skill gets something wrong, see [Feedback](#feedback).
 
 ## Skills
 
@@ -43,7 +43,7 @@ The review script needs Python 3.9 or later; without it, the review continues by
 |---|---|---|
 | [`bachelor-thesis-planning`](skills/bachelor-thesis-planning/SKILL.md) | Sharpen an idea into a proposal, and connect each objective to an artifact, evidence and a section | Idea, Plan |
 | [`bachelor-thesis-writing`](skills/bachelor-thesis-writing/SKILL.md) | Write sections, a chapter or the whole thesis from real evidence, with your use of AI on record | Write |
-| [`bachelor-thesis-review`](skills/bachelor-thesis-review/SKILL.md) | Review through five gates, rehearse the defense, and list what is open before submitting | Review, Defense, Final |
+| [`bachelor-thesis-review`](skills/bachelor-thesis-review/SKILL.md) | Review through five gates, rehearse the defense, list what is open before submitting, and help you report a problem with the skills | Review, Defense, Final, Feedback |
 
 ## How it works
 
@@ -124,7 +124,7 @@ skills/
   bachelor-thesis-planning/   SKILL.md, references/, assets/
   bachelor-thesis-writing/    SKILL.md, references/, assets/, profiles/
   bachelor-thesis-review/     SKILL.md, references/, assets/, profiles/, scripts/, data/
-commands/                     /idea, /plan, /write, /review, /defense, /final for Claude Code
+commands/                     /idea, /plan, /write, /review, /defense, /final, /feedback for Claude Code
 evals/                        pressure scenarios, a fictional project builder, results
 tests/                        checks for the review script and the repository
 .claude-plugin/               Claude Code marketplace
@@ -137,6 +137,15 @@ Each change to a skill comes with a scenario in [`evals/scenarios.json`](evals/s
 ## About this project
 
 This is a personal contribution by Hung N. Dang (Lecturer & Researcher, PTIT), made first for the students I supervise. I am responsible for the conventions in this repository. It is not a regulation of PTIT or of any other institution. Use it if it helps; nobody is required to. Whether it ever becomes official is a question for later. The lifecycle idea is adapted from [agent-skills](https://github.com/addyosmani/agent-skills), rewritten for theses.
+
+## Feedback
+
+These skills improve from reports on real theses. If a skill does something wrong, unhelpful or missing, tell us in one of two ways:
+
+1. **Ask your agent.** Say "report a problem with the thesis skills", or run `/feedback` (`/bachelor-thesis:feedback` in Claude Code). It drafts a report from your session with your thesis left out, asks you for a few sentences in your own words, and gives you a link that opens the form already filled in. Nothing is sent until you submit it from your own GitHub account.
+2. **Or open a form yourself:** [a skill did something wrong](https://github.com/hungdn1701/bachelor-thesis-skill/issues/new?template=skill-behavior.yml), [an idea or a missing step](https://github.com/hungdn1701/bachelor-thesis-skill/issues/new?template=idea.yml), or [a school's format rules](https://github.com/hungdn1701/bachelor-thesis-skill/issues/new?template=school-profile.yml).
+
+A useful report names the skill and step, the skill version (`version` in that skill's `SKILL.md`), your agent and model, what you asked, what it did and what you expected. The tracker is public: leave out your thesis text, names, data, topic and internal system names, and use made-up examples instead. If your advisor runs a trial with a feedback form in your project, record it there too.
 
 ## Contributing
 

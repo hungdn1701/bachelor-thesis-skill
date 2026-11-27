@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 (unreleased)
+
+- Feedback: ask the agent to "report a problem with the thesis skills", or run `/feedback`, and the review skill drafts a report with the thesis left out, asks the student for a summary in their own words, and hands over a link to the filled-in form; nothing is sent without a clear yes, and the student submits it from their own account.
+- Issue forms: the behavior form adds the planning skill, the step, the skill version, the agent and model, a severity, the student's own summary, and checks for thesis content and duplicates; a new form for ideas; blank issues off, with a link to the README's feedback section. The labels the forms use now exist.
+- README: a Feedback section in both languages, linked from the quick start.
+- Evals: the fixture builder skips an empty project name instead of deleting its base folder.
+
 ## 0.3.0 (unreleased)
 
 From the first trial on a real group thesis, and the student group's report on it.

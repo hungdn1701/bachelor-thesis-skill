@@ -1,12 +1,12 @@
 ---
 name: bachelor-thesis-review
-description: Use when a student or advisor wants a bachelor or engineering graduation thesis, chapter or section reviewed for honesty, logic, structure, format or academic style, wants to rehearse the defense, or wants to check a final version before submitting, even when they only ask for a quick confirmation. Triggers in Vietnamese include rà đồ án, rà chương, kiểm tra đồ án, chạy gate, biên bản rà, kiểm tra trước khi nộp, sẵn sàng nộp, bản cuối, luyện bảo vệ, hội đồng giả, văn phong AI.
+description: Use when a student or advisor wants a bachelor or engineering graduation thesis, chapter or section reviewed for honesty, logic, structure, format or academic style, wants to rehearse the defense, wants to check a final version before submitting, or wants to report a problem with these thesis skills to their authors, even when they only ask for a quick confirmation. Triggers in Vietnamese include rà đồ án, rà chương, kiểm tra đồ án, chạy gate, biên bản rà, kiểm tra trước khi nộp, sẵn sàng nộp, bản cuối, luyện bảo vệ, hội đồng giả, văn phong AI, báo lỗi bộ skill, phản hồi về skill, góp ý bộ skill.
 license: CC-BY-4.0 (scripts/ under MIT, see scripts/LICENSE)
 compatibility: Needs to read files in the student's project folder and write the review record. The checker needs Python 3.9 or later; without it the review continues by reading only.
 metadata:
   author: Hung N. Dang
   source: https://github.com/hungdn1701/bachelor-thesis-skill
-  version: "0.3.0"
+  version: "0.3.1"
 ---
 
 # Bachelor Thesis Review
@@ -22,6 +22,7 @@ Paths under `references/`, `assets/`, `profiles/`, `scripts/` and `data/` are in
 | A review | The workflow below | The gate references |
 | To rehearse the defense | Test claims as a committee would | `references/defense.md` |
 | To check a final version | List what is still open | `references/final.md` |
+| To report a problem with these skills | Draft a report without thesis content, and hand it to the student to send | `references/feedback.md` |
 
 ## Rules
 

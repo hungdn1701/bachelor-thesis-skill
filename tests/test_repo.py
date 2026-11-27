@@ -13,7 +13,7 @@ except ImportError:
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS = os.path.join(ROOT, "skills")
 NAMES = ("bachelor-thesis-planning", "bachelor-thesis-writing", "bachelor-thesis-review")
-COMMANDS = ("idea", "plan", "write", "review", "defense", "final")
+COMMANDS = ("idea", "plan", "write", "review", "defense", "final", "feedback")
 
 
 def read(*parts):
