@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0 (unreleased)
+
+From the first trial on a real group thesis, and the student group's report on it.
+
+- Writing: a limit the whole chapter shares is stated once, at the start of the evaluation chapter and where results meet the objectives, instead of in every section; bad results still stay in the thesis. `[MISSING]` marks only a missing number or source; acknowledgements and assessments are asked for, with one mark per section in a run. No sentences about what the text does not do.
+- Evidence: values come from the configuration or script of the version described, not from documents or papers that report another one. Labels, statuses and formulas are read from the code that produces them. A component counts only if the deployed configuration enables it. Rules for tests a tool ran: consent before touching a live system, one statement in the evaluation chapter, rows unverified until the student reruns. Access dates are never made up.
+- Group theses: the body speaks of the group, not of members by name; the division table lists what members confirm; revisions after a review go one finding at a time.
+- Length: setup asks for the page limits, the plan budgets pages per chapter, and each run reports pages against the limit. The checker warns when the PDF is over the maximum, counting pages without PyMuPDF.
+- Terms: a shared `docs/terms.md`, read before drafting and checked by the style gate across chapters, tables and figure labels.
+- Sign-off: the template and the reminder spell out a new row each time, the real date, the current section numbers and the commit read; the student makes that commit. A question about how to sign, merge or send now loads the writing skill, which holds the rule.
+- The student's columns: every turn names the `ai-log.md` rows and record warnings still waiting for the student, who alone fills them in.
+- Review coverage: each review records its commit and scope; a review in the drafting session is a self-check; a partial review lists the whole-thesis checks it could not make. The checker reports changes since the last review in a new session, and a signed version that contains changes no review covered. `/final` lists them.
+- Gates: honesty opens the source of key results and checks its version, and reads the code behind labels and formulas; logic maps every finding in the abstract and conclusion to the table, figure or section that shows it; style checks terms across the thesis and flags repeated limits and members named in the body.
+- README: install first, with the skills CLI, the Claude Code marketplace or by hand; a table of skills, the project files, the repository layout, evaluation and citation.
+
 ## 0.2.0 (unreleased)
 
 - From an idea to submission: `/idea`, `/plan`, `/write`, `/review`, `/defense`, `/final`.

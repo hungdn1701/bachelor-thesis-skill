@@ -9,6 +9,7 @@ import tempfile
 import unicodedata
 import unittest
 import zipfile
+import zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPT = os.path.join(ROOT, "skills", "bachelor-thesis-review", "scripts", "check_thesis.py")
@@ -519,6 +520,130 @@ class SignOff(unittest.TestCase):
         self.git(ws, "init", "-q")
         self.commit(ws, "first")
         self.assertEqual([f.severity for f in self.signoff_findings(ws)], ["low"])
+
+
+class ReviewCoverage(unittest.TestCase):
+    """The record says which commit a review read; the script reports what came after it."""
+
+    SIGNOFF = "| Ngày | Phiên bản | Phạm vi | Mục đích | Người xác nhận |\n|---|---|---|---|---|\n"
+
+    def run_block(self, commit, scope="toàn văn / full ☒", same_session=False):
+        mark = ("☐", "☒") if same_session else ("☒", "☐")
+        return (
+            "## Lần rà / Review run\n\n"
+            f"- Commit: {commit}\n"
+            f"- Phạm vi / Scope: {scope}\n"
+            f"- Phiên rà / Review session: phiên mới / new session {mark[0]} — cùng phiên với lúc viết / same session {mark[1]}\n\n"
+        )
+
+    def workspace(self):
+        ws = Workspace("# Mở đầu\n\nA\n")
+        self.addCleanup(ws.close)
+        with open(os.path.join(ws.root, ".thesis", "config.json"), encoding="utf-8") as handle:
+            config = json.load(handle)
+        config["signoff"] = "docs/sign-off.md"
+        write(ws.root, ".thesis/config.json", json.dumps(config))
+        self.git(ws, "init", "-q")
+        return ws
+
+    git = SignOff.git
+    commit = SignOff.commit
+    signoff_findings = SignOff.signoff_findings
+
+    def coverage(self, ws):
+        with open(os.path.join(ws.root, ".thesis", "config.json"), encoding="utf-8") as handle:
+            return checker.check_review_coverage(ws.root, json.load(handle))
+
+    def test_reads_commit_scope_and_session_of_each_run(self):
+        ws = self.workspace()
+        path = write(ws.root, "docs/gate-record.md", self.run_block("abc1234", "chỉ mục 1.4", True) + self.run_block("`main` @ `def5678`"))
+        runs = checker.review_runs(path)
+        self.assertEqual([run["commit"] for run in runs], ["abc1234", "def5678"])
+        self.assertEqual([run["self_check"] for run in runs], [True, False])
+        self.assertEqual(runs[0]["scope"], "chỉ mục 1.4")
+
+    def test_full_review_of_the_current_version_is_quiet(self):
+        ws = self.workspace()
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/gate-record.md", self.run_block(version))
+        self.assertEqual(self.coverage(ws), [])
+
+    def test_changes_after_the_last_review_are_reported(self):
+        ws = self.workspace()
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/gate-record.md", self.run_block(version))
+        write(ws.root, ws.source, "# Mở đầu\n\nB\n")
+        self.commit(ws, "second")
+        findings = self.coverage(ws)
+        self.assertTrue(has(findings, "1 commit đổi nội dung sau lần rà"))
+        self.assertEqual([f.severity for f in findings], ["low"])
+
+    def test_a_self_check_is_not_a_review(self):
+        ws = self.workspace()
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/gate-record.md", self.run_block(version, same_session=True))
+        self.assertTrue(has(self.coverage(ws), "chưa có lần rà nào trong phiên mới"))
+
+    def test_a_partial_review_names_the_whole_thesis_checks_it_left_out(self):
+        ws = self.workspace()
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/gate-record.md", self.run_block(version, "các mục của một thành viên"))
+        self.assertTrue(has(self.coverage(ws), "Kết luận"))
+
+    def test_a_signed_version_with_unreviewed_changes_is_medium(self):
+        ws = self.workspace()
+        reviewed = self.commit(ws, "first")
+        write(ws.root, "docs/gate-record.md", self.run_block(reviewed))
+        write(ws.root, ws.source, "# Mở đầu\n\nB\n")
+        signed = self.commit(ws, "second")
+        write(ws.root, "docs/sign-off.md", self.SIGNOFF + f"| 2026-11-25 | nhánh @ {signed} | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        findings = [f for f in self.coverage(ws) if f.where == "docs/sign-off.md"]
+        self.assertEqual([f.severity for f in findings], ["medium"])
+        self.assertTrue(has(findings, signed))
+
+    def test_signed_row_with_branch_and_commit_is_compared_by_commit(self):
+        ws = self.workspace()
+        version = self.commit(ws, "first")
+        write(ws.root, "docs/sign-off.md", self.SIGNOFF + f"| 2026-11-25 | nhánh @ {version} | Toàn bộ | gửi GVHD | Sinh viên A |\n")
+        self.assertEqual(self.signoff_findings(ws), [])
+
+
+def minimal_pdf(pages, compressed=False):
+    tree = f"<< /Type /Pages /Kids [] /Count {pages} >>".encode()
+    if compressed:
+        packed = zlib.compress(tree)
+        body = b"2 0 obj\n<< /Type /ObjStm /Filter /FlateDecode /Length %d >>\nstream\n%s\nendstream\nendobj\n" % (len(packed), packed)
+    else:
+        body = b"2 0 obj\n" + tree + b"\nendobj\n"
+    return b"%PDF-1.7\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n" + body + b"%%EOF\n"
+
+
+class Length(unittest.TestCase):
+    def pdf(self, pages, compressed=False):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = os.path.join(tmp.name, "do-an.pdf")
+        with open(path, "wb") as handle:
+            handle.write(minimal_pdf(pages, compressed))
+        return path
+
+    def test_counts_pages_in_plain_and_compressed_page_trees(self):
+        self.assertEqual(checker.pdf_page_count(self.pdf(12)), 12)
+        self.assertEqual(checker.pdf_page_count(self.pdf(120, compressed=True)), 120)
+
+    def test_over_the_maximum_is_low(self):
+        findings = checker.check_length("dist/do-an.pdf", self.pdf(120), {"pages": {"min": None, "max": 95}})
+        self.assertEqual([f.severity for f in findings], ["low"])
+        self.assertTrue(has(findings, "120 trang"))
+
+    def test_no_limit_is_quiet(self):
+        self.assertEqual(checker.check_length("dist/do-an.pdf", self.pdf(120), {"pages": {"min": None, "max": None}}), [])
+        self.assertEqual(checker.check_length("dist/do-an.pdf", self.pdf(120), {}), [])
+
+    def test_under_the_minimum_counts_only_for_the_full_thesis(self):
+        config = {"pages": {"min": 50, "max": None}}
+        self.assertEqual(checker.check_length("dist/do-an.pdf", self.pdf(20), config), [])
+        self.assertEqual(len(checker.check_length("dist/do-an.pdf", self.pdf(20), {**config, "scope": "full"})), 1)
 
 
 @unittest.skipIf(importlib.util.find_spec("pymupdf") is None, "PyMuPDF is not installed")

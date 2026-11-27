@@ -23,6 +23,10 @@ Words such as *vượt trội, đột phá, tối ưu, toàn diện, mạnh mẽ
 - Stock wording: "đóng vai trò then chốt", "nền tảng vững chắc", "bức tranh toàn cảnh", "plays a crucial role", "delve into".
 - Metaphors: "chìa khóa", "đòn bẩy", "hành trình", "xương sống", "landscape", "tapestry".
 
+## Terms across the thesis (`medium`)
+
+Build a list of the thesis's key terms: from `docs/terms.md` if it exists, otherwise from definitions, the abbreviation list and the headings. Then look for each concept under other names, in the text, table headers and figure labels; read a figure's source or the image when its labels are text you can reach. Report each concept that has two names, with every location, and suggest the name already used most, or the one in `docs/terms.md`. In a group thesis, check across the parts of different writers. A partial review checks only its own scope: say so.
+
 ## Patterns (`low`)
 
 Report these only when they recur:
@@ -32,6 +36,9 @@ Report these only when they recur:
 - Dashes used for asides, and semicolons chaining clauses.
 - Bold lead-ins on every list item, and lists where a paragraph would argue better.
 - Several names for one concept in a paragraph.
+- The same limit stated again in section after section, instead of once for the chapter.
+- Sentences about what the text does not do, such as "this section does not judge whether the objective is met".
+- A member of a group named in the body, such as "according to Lan".
 - Sentences too long to read aloud.
 
 ## Language
@@ -42,7 +49,7 @@ Report these only when they recur:
 ## Keep these
 
 - Bounding words: "có thể", "trong điều kiện thử nghiệm", "suggests", "in this test". Removing them turns an observation into a stronger claim.
-- Scope statements and stated limits.
+- Scope statements and stated limits, said once where they belong. When a repeated limit is removed, it must still be stated somewhere.
 - An AI-use disclosure required by the school.
 - A tool name when the tool is the subject of the thesis.
 - Terms of art that look like jargon, and "state of the art" when describing the literature.

@@ -38,3 +38,7 @@ Every `partial` or `missing` row goes in the gap list with what is needed and wh
 Take the riskiest evidence first, since the plan may change if it fails. Requirements come before the chapters that evaluate them. For a group thesis, add an owner to each row and leave the division to the group.
 
 Set milestones backward from the deadline, around meetings with the advisor. If a date is unknown, leave it empty and ask.
+
+## 6. Budget the length
+
+Ask for the page limits the school or the advisor set, and what they count. Share the maximum between the chapters in the plan's length table, with more room for the chapters that carry the evidence. If nobody has set a limit, leave the table empty and suggest asking: a thesis written without a budget is usually cut at the end, and cutting costs more than writing to size.

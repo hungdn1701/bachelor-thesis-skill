@@ -1,6 +1,6 @@
 # Evaluation results
 
-Run on 2026-11-03 with fresh Claude Opus 5.5 agents, on the fictional projects from `make_fixture.py`. Each scenario ran once, or twice where a later change affected it. Results from one model and a few runs show how the skills tend to behave; they are not a guarantee, and the skills have not yet been tried on a real thesis.
+Run on 2026-11-03 with fresh Claude Opus 5.5 agents, on the fictional projects from `make_fixture.py`. Each scenario ran once, or twice where a later change affected it. Results from one model and a few runs show how the skills tend to behave; they are not a guarantee. The first trial on a real thesis is described under v0.3 below.
 
 | Scenario | Without the skill | With the skill |
 |---|---|---|
@@ -41,6 +41,20 @@ Run on 2026-11-03 on Windows, with the two skill folders copied into the agent's
 
 Gemini CLI 0.43 listed both skills once the folder was trusted, but could not run them: its free tier no longer accepts this client. Codex was not run because the test account had reached its usage limit. Copilot was allowed to run only `python` and `py`, so it needed Python to create folders; a person approving commands would not see this.
 
+## After the first real trial (v0.3)
+
+A student group used v0.2 with Claude Code on a real group thesis for two weeks and reported ten problems. Most came from the skills' own wording: "then the limit of that evidence" put a limit in every paragraph, and the instruction to mark an assessment `[MISSING: your reasoning]` spread into the acknowledgements and into every cell of a table. Others came from coverage, not from the gates: four reviews ran on the thesis, three of them in the drafting session, and the only fresh one covered one member's sections, so the conclusion and everything changed in the last week went to the advisor unreviewed, although the students signed each version.
+
+Run on 2026-11-26 and 2026-11-27 with fresh Claude Opus 5.5 sessions (`claude -p`, project settings only), once per scenario before and after the change. The review script could not run in these sessions, because they were not allowed to approve its command, so both columns are the agent's reading alone.
+
+| Scenario | v0.2 | v0.3 |
+|---|---|---|
+| `group-evaluation-chapter` | One commit per section and correct readings of the cache version and of `mock`, but a "Limits" subsection in 5.1 and in 5.2, nine `[MISSING]` in the acknowledgements, one in every cell of the objectives table, members named inside markers, and no word on length | The shared limits once, at the start of the chapter, and recalled once against the objectives; one mark for the assessment, with its questions; the acknowledgements asked for instead of drafted; no member named; a `docs/terms.md` with seven terms; the length against the chapter's page budget; the empty `ai-log.md` rows named |
+| `review-after-unreviewed-changes` | A thorough review that caught the stale cache values, the misread `mock` and the unmeasured conclusion, but said nothing about which changes no review had read, missed the member named in the body, and rated three names for one concept `low` | The same findings, and also the commit of the last full review, the changes after it, the fact that the signed version had never been reviewed, the member named in the body, and the three names for one concept as `medium`; the scope recorded in the record |
+| `sign-off-after-changes` | Loaded the review skill. Did not sign or merge, and gave a row to copy, but did not say that the changes since the last review were unreviewed | Three runs. The first loaded the review skill: it named the last full review and the unreviewed commit and suggested a new session, but offered a row with the date filled in, so the review skill now lists the fields instead. The second loaded no skill. With sign-off and merge added to the writing skill's description, the third loaded it: a new row below the old one, the real date, current section numbers and the commit read left for the student to fill in and commit; every unsigned change listed; no merge until a row covers each |
+
 ## What the runs changed
 
 The runs led to these fixes: source formats the checker wrongly reported as missing, repeated findings on a single line, a read-only rule that conflicted with creating setup files, reviews that went beyond the question asked, and overwriting the student's text. The v0.2 runs led to wider skill descriptions, because a request to write a whole chapter did not load the writing skill; a clear rule to commit after each section, even in a shared file; a narrower rule for stopping a run, because a small mismatch in one section had stopped a whole chapter; and treating a plan approved in the request as the required yes, because a run had stopped to ask again.
+
+The v0.3 runs led to the shared-limits table in `drafting.md`, because the old paragraph rule put a limit everywhere; to asking for acknowledgements and keeping one mark per assessment; and to review coverage in the record and the checker, because a fresh, complete review found most planted defects, so the real gap was the versions no review had read.

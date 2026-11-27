@@ -21,6 +21,7 @@ import sys
 import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
+import zlib
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 TWIP_PER_CM = 566.93
@@ -363,19 +364,91 @@ def check_signoff(root, config):
     rows = signed_rows(path) if os.path.exists(path) else []
     if not rows:
         return [Finding("honesty", severity, rel, "Chưa có dòng xác nhận của sinh viên; cần tự đọc và tự ký trước khi gộp, gửi giảng viên hoặc chốt một phiên bản.")]
-    version = rows[-1][1].strip("`")
-    sources = [item for item in config.get("sources", [])]
-    command = ["git", "-C", root, "rev-list", "--count", f"{version}..HEAD", "--", *expand_sources(root, sources)]
-    try:
-        result = subprocess.run(command, capture_output=True, text=True, timeout=30)
-    except (OSError, subprocess.SubprocessError):
-        return []
-    if result.returncode != 0:
+    version = version_of(rows[-1][1])
+    count = git_count(root, f"{version}..HEAD", expand_sources(root, config.get("sources", [])))
+    if count is None:
         return [Finding("honesty", "low", rel, f"Không đối chiếu được phiên bản đã ký '{version}' với lịch sử git.")]
-    count = int(result.stdout.strip() or 0)
     if count:
         return [Finding("honesty", "medium", rel, f"Có {count} commit đổi nội dung sau phiên bản đã ký '{version}'; cần đọc và xác nhận lại trước khi chốt.")]
     return []
+
+
+COMMIT_ID = re.compile(r"\b[0-9a-f]{7,40}\b")
+CHECKED = re.compile(r"[☒☑✓✔]|\[[xX]\]")
+FULL_SCOPE = re.compile(r"(toàn văn|full)[^☐—]*?[☒☑✓✔]|\[[xX]\]\s*(toàn văn|full)", re.I)
+RUN_HEADING = re.compile(r"##\s+(Lần rà|Review run)", re.I)
+RECORD_FIELD = re.compile(r"\s*-\s*([^:]+):(.*)")
+
+
+def version_of(cell):
+    """The commit id in a cell such as 'main @ abc1234', or the cell itself, such as a tag."""
+    cell = cell.strip().strip("`")
+    match = COMMIT_ID.search(cell)
+    return match.group(0) if match else cell
+
+
+def git_count(root, revisions, paths):
+    """Number of commits in a range that touch the paths, or None if git cannot tell."""
+    command = ["git", "-C", root, "rev-list", "--count", revisions, "--", *paths]
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    return int(result.stdout.strip() or 0)
+
+
+def review_runs(path):
+    """The review runs in a record, oldest first, with their commit, scope and session."""
+    runs = []
+    with open(path, encoding="utf-8", errors="replace") as handle:
+        for line in handle:
+            if RUN_HEADING.match(line):
+                runs.append({"commit": None, "scope": "", "self_check": False})
+                continue
+            field = RECORD_FIELD.match(line)
+            if not runs or not field:
+                continue
+            label, value = field.group(1).lower(), re.sub(r"<!--.*?-->", "", field.group(2))
+            run = runs[-1]
+            if label.startswith("commit") and run["commit"] is None:
+                match = COMMIT_ID.search(value)
+                run["commit"] = match.group(0) if match else None
+            elif "scope" in label or "phạm vi" in label:
+                run["scope"] = run["scope"] or value.strip()
+            elif "session" in label or "phiên rà" in label:
+                run["self_check"] = bool(CHECKED.search(re.split(r"—|--", value)[-1]))
+    return runs
+
+
+def check_review_coverage(root, config):
+    """Warns only. Says what no review in a new session has read, so that nobody signs it unawares."""
+    rel = config.get("record")
+    if not rel or not os.path.exists(os.path.join(root, rel)):
+        return []
+    runs = [run for run in review_runs(os.path.join(root, rel)) if run["commit"] and not run["self_check"]]
+    if not runs:
+        return [Finding("honesty", "low", rel, "Biên bản chưa có lần rà nào trong phiên mới ghi commit; chưa biết phần nào đã được rà.")]
+    last = runs[-1]
+    paths = expand_sources(root, config.get("sources", []))
+    changed = git_count(root, f"{last['commit']}..HEAD", paths)
+    if changed is None:
+        return [Finding("honesty", "low", rel, f"Không đối chiếu được commit '{last['commit']}' của lần rà gần nhất với lịch sử git.")]
+    findings = []
+    if changed:
+        findings.append(Finding("honesty", "low", rel, f"Có {changed} commit đổi nội dung sau lần rà gần nhất trong phiên mới ({last['commit']}); phần đổi này chưa được rà."))
+    if not FULL_SCOPE.search(last["scope"]):
+        scope = last["scope"][:80] or "không ghi phạm vi"
+        findings.append(Finding("honesty", "low", rel, f"Lần rà gần nhất có thể chỉ rà một phần ({scope}); các phép kiểm toàn văn như Tóm tắt, Kết luận, thuật ngữ giữa các chương chưa chạy."))
+    signoff = config.get("signoff")
+    if signoff and os.path.exists(os.path.join(root, signoff)):
+        rows = signed_rows(os.path.join(root, signoff))
+        version = version_of(rows[-1][1]) if rows else None
+        unreviewed = git_count(root, f"{last['commit']}..{version}", paths) if version else None
+        if unreviewed:
+            findings.append(Finding("honesty", "medium", signoff, f"Phiên bản đã ký '{version}' có {unreviewed} commit đổi nội dung sau lần rà gần nhất ({last['commit']}); phần đổi đó đã được ký nhưng chưa được rà."))
+    return findings
 
 
 def check_measurements(doc, known):
@@ -620,6 +693,44 @@ def check_geometry(doc, profile):
     return findings
 
 
+PAGE_TREE = (
+    re.compile(rb"/Type\s*/Pages\b(?:(?!endobj).){0,600}?/Count\s+(\d+)", re.S),
+    re.compile(rb"/Count\s+(\d+)(?:(?!endobj).){0,600}?/Type\s*/Pages\b", re.S),
+)
+
+
+def pdf_page_count(path):
+    """Page count from the root of the page tree, standard library only. None if it cannot tell."""
+    with open(path, "rb") as handle:
+        data = handle.read()
+    chunks = [data]
+    for match in re.finditer(rb"(?<!end)stream\r?\n", data):
+        end = data.find(b"endstream", match.end())
+        if end < 0:
+            break
+        try:
+            chunks.append(zlib.decompressobj().decompress(data[match.end():end], 4_000_000))
+        except zlib.error:
+            continue
+    counts = [int(found) for chunk in chunks for pattern in PAGE_TREE for found in pattern.findall(chunk)]
+    return max(counts) if counts else None
+
+
+def check_length(rel, path, config):
+    limits = config.get("pages") or {}
+    if not isinstance(limits, dict) or not (limits.get("min") or limits.get("max")):
+        return []
+    count = pdf_page_count(path)
+    if count is None:
+        return [Finding("format", "low", rel, "Không đọc được số trang của PDF; cần đếm số trang bằng tay.")]
+    findings = []
+    if limits.get("max") and count > limits["max"]:
+        findings.append(Finding("format", "low", rel, f"PDF có {count} trang, quá giới hạn tối đa {limits['max']} trang ghi trong cấu hình; kiểm lại giới hạn tính những phần nào."))
+    if limits.get("min") and count < limits["min"] and config.get("scope") == "full":
+        findings.append(Finding("format", "low", rel, f"PDF có {count} trang, dưới mức tối thiểu {limits['min']} trang ghi trong cấu hình; kiểm lại mức này tính những phần nào."))
+    return findings
+
+
 def check_pdf(root, config, profile):
     rel = config.get("pdf")
     if not rel:
@@ -627,11 +738,11 @@ def check_pdf(root, config, profile):
     path = os.path.join(root, rel)
     if not os.path.exists(path):
         return [Finding("format", "low", rel, "Chưa có PDF xuất ra; bỏ qua kiểm tra PDF.")]
+    findings = check_length(rel, path, config)
     try:
         import pymupdf
     except ImportError:
-        return [Finding("format", "low", rel, "Máy chưa có PyMuPDF; bỏ qua kiểm tra PDF.")]
-    findings = []
+        return findings + [Finding("format", "low", rel, "Máy chưa có PyMuPDF; bỏ qua kiểm tra PDF.")]
     document = pymupdf.open(path)
     paper = profile.get("paper")
     if paper and document.page_count:
@@ -710,6 +821,7 @@ def run_checks(root, config):
     findings, rows = check_claims(root, config)
     findings += check_ai_log(root, config)
     findings += check_signoff(root, config)
+    findings += check_review_coverage(root, config)
     known = claim_numbers(rows)
     for doc in docs:
         findings += check_measurements(doc, known)

@@ -1,10 +1,12 @@
 """Create fictional thesis projects with planted defects, one folder per run.
 
-Usage: python make_fixture.py <base_dir> [--research | --planned] <name> [<name> ...]
+Usage: python make_fixture.py <base_dir> [--research | --planned | --group | --reviewed] <name> [<name> ...]
 Nothing here refers to a real student or project.
 """
+import json
 import os
 import shutil
+import subprocess
 import sys
 import zipfile
 
@@ -142,6 +144,159 @@ def build_planned(root):
         handle.write(PLAN)
 
 
+GROUP_FILES = {
+    "README.md": "# Đồ án nhóm: Hệ thống đặt phòng học có thông báo\n\n"
+    "Nhóm hai sinh viên: Lan (dịch vụ đặt phòng, đo tải), Minh (thông báo, bộ nhớ đệm). Loại đồ án: xây dựng. Bản nháp viết bằng Markdown.\n",
+    "src/booking.py": FILES["src/booking.py"],
+    "src/notify.py": '"""Gửi thư xác nhận đặt phòng."""\n\nimport os\n\n'
+    'SMTP_HOST = os.environ.get("SMTP_HOST", "")\n\n\n'
+    "def send(to, text):\n"
+    '    # Không cấu hình máy chủ thư thì không gửi gì cả.\n'
+    "    if not SMTP_HOST:\n"
+    '        return {"mode": "mock", "sent": False}\n'
+    "    deliver(SMTP_HOST, to, text)\n"
+    '    return {"mode": "smtp", "sent": True}\n',
+    "config/cache-v1.yaml": "version: v1\nttl_seconds: 30\nmax_entries: 500\n",
+    "config/cache-v2.yaml": "version: v2\nttl_seconds: 120\nmax_entries: 2000\n",
+    "docs/cache-design.md": "# Thiết kế bộ nhớ đệm\n\nViết tháng 9/2026, trước khi đổi cấu hình. Bộ nhớ đệm giữ mỗi mục 60 giây, tối đa 1000 mục.\n",
+    "data/load-v2-2026-11-02.csv": "concurrent_users,avg_response_ms,p95_response_ms,error_rate_percent\n"
+    "50,141,260,0.1\n100,198,402,0.3\n200,455,1120,2.4\n",
+    "data/notify-run-2026-11-05.csv": "booking_id,mode,sent\nb1,mock,False\nb2,mock,False\nb3,mock,False\n",
+    "data/README.txt": "Đo tải ngày 02/11/2026 với config/cache-v2.yaml, máy 4 vCPU 8 GB, một lần chạy mỗi mức tải.\n"
+    "Phép thử thông báo ngày 05/11/2026 do trợ lý AI chạy theo yêu cầu của nhóm; nhóm chưa chạy lại.\n",
+    "tests/test_booking.py": FILES["tests/test_booking.py"],
+    "docs/plan.md": "# Kế hoạch đồ án\n\nTrạng thái: giảng viên đã xem ngày 20/10/2026, đồng ý.\n\n"
+    "| Mục tiêu | Yêu cầu | Artifact | Đánh giá, bằng chứng | Mục | Người viết | Trạng thái |\n|---|---|---|---|---|---|---|\n"
+    "| O1 | R1 Phục vụ 200 người dùng đồng thời | A1 Dịch vụ đặt phòng, cache v2 | k6, data/load-v2-2026-11-02.csv | 5.1 Kiểm thử hiệu năng | Lan | have |\n"
+    "| O2 | R2 Báo cho người đặt | A2 Thông báo | data/notify-run-2026-11-05.csv | 5.2 Kiểm thử thông báo | Minh | partial |\n"
+    "| O1, O2 | Tất cả | A1, A2 | Đối chiếu kết quả với mục tiêu | 5.3 Đối chiếu mục tiêu | Lan, Minh | missing |\n\n"
+    "## Độ dài\n\nGiới hạn: tối đa 60 trang (thầy hướng dẫn).\n\n| Chương | Số trang dự kiến |\n|---|---|\n| Chương 5 | 12 |\n",
+    "thesis/loi-cam-on.md": "# Lời cảm ơn\n\n",
+    "docs/ai-log.md": "# Nhật ký sử dụng AI\n\n| Ngày | Công cụ | Việc đã làm | Phần liên quan | Giữ, sửa, kiểm tra gì |\n|---|---|---|---|---|\n"
+    "| 2026-11-05 | Trợ lý AI | Chạy phép thử thông báo, ghi data/notify-run-2026-11-05.csv | 5.2 | |\n",
+}
+
+REVIEWED_V1 = {
+    "thesis/tom-tat.md": "# Tóm tắt\n\nĐồ án xây dựng hệ thống đặt phòng học có thư xác nhận. Ở 200 người dùng đồng thời, "
+    "thời gian phản hồi trung bình là 455 ms, tỉ lệ lỗi 2,4%.\n",
+    "thesis/ch3-thiet-ke.md": "# Chương 3. Phân tích và thiết kế\n\n## 3.2. Kiến trúc\n\n"
+    "Dịch vụ đặt phòng đọc danh sách phòng qua bộ nhớ đệm, rồi mới tới cơ sở dữ liệu (Hình 3.2).\n\n"
+    "```mermaid\nflowchart LR\n  A[Dịch vụ đặt phòng] --> B[Bộ đệm] --> C[(Cơ sở dữ liệu)]\n```\n\n"
+    "Hình 3.2. Luồng đọc danh sách phòng\n",
+    "thesis/ch4-trien-khai.md": "# Chương 4. Triển khai\n\n## 4.2. Bộ nhớ đệm\n\n"
+    "Bộ nhớ đệm dùng cấu hình v2: mỗi mục giữ 120 giây, tối đa 2000 mục.\n",
+    "thesis/ch5-danh-gia.md": "# Chương 5. Kiểm thử và đánh giá\n\n"
+    "Các phép đo chạy một lần mỗi mức tải trên máy 4 vCPU, 8 GB RAM. Phép thử thông báo do trợ lý AI chạy, nhóm chưa chạy lại.\n\n"
+    "## 5.1. Kiểm thử hiệu năng\n\nỞ 200 người dùng đồng thời, thời gian phản hồi trung bình là 455 ms, tỉ lệ lỗi 2,4% (Bảng 5.1).\n\n"
+    "Bảng 5.1. Kết quả đo tải với cache v2\n\n| Người dùng | Trung bình (ms) | Tỉ lệ lỗi |\n|---|---|---|\n"
+    "| 50 | 141 | 0,1% |\n| 100 | 198 | 0,3% |\n| 200 | 455 | 2,4% |\n\n"
+    "## 5.2. Kiểm thử thông báo\n\nBa lượt đặt phòng ghi chế độ `mock`, không thư nào được gửi, vì môi trường thử chưa cấu hình máy chủ thư.\n",
+    "thesis/ch6-ket-luan.md": "# Kết luận\n\nHệ thống đáp ứng 200 người dùng đồng thời trên máy thử, với thời gian phản hồi trung bình 455 ms. "
+    "Việc gửi thư chưa được thử với máy chủ thư thật.\n",
+}
+
+REVIEWED_V2 = {
+    "thesis/ch4-trien-khai.md": "# Chương 4. Triển khai\n\n## 4.2. Bộ nhớ đệm\n\n"
+    "Bộ nhớ đệm giữ mỗi mục 60 giây, tối đa 1000 mục.\n",
+    "thesis/ch5-danh-gia.md": "# Chương 5. Kiểm thử và đánh giá\n\n"
+    "## 5.1. Kiểm thử hiệu năng\n\nỞ 200 người dùng đồng thời, thời gian phản hồi trung bình là 455 ms, tỉ lệ lỗi 2,4% (Bảng 5.1). "
+    "Nhờ cache, danh sách phòng được trả về nhanh.\n\n"
+    "Bảng 5.1. Kết quả đo tải\n\n| Người dùng | Trung bình (ms) | Tỉ lệ lỗi |\n|---|---|---|\n"
+    "| 50 | 141 | 0,1% |\n| 100 | 198 | 0,3% |\n| 200 | 455 | 2,4% |\n\n"
+    "*Giới hạn.* Mỗi mức tải chỉ chạy một lần, trên một máy.\n\n"
+    "## 5.2. Kiểm thử thông báo\n\nPhần thông báo do Minh xây dựng. Ba lượt đặt phòng ghi chế độ `mock`, tức là hệ thống được nối với "
+    "một máy chủ thư giả luôn trả lời thành công.\n\n"
+    "*Giới hạn.* Phép thử chỉ chạy một lần, trên một máy, do trợ lý AI chạy.\n\n"
+    "## 5.3. Đối chiếu mục tiêu\n\nO1 đạt ở 200 người dùng đồng thời. O2 đã được kiểm.\n\n"
+    "*Giới hạn.* Các phép đo chỉ chạy một lần, trên một máy.\n",
+    "thesis/ch6-ket-luan.md": "# Kết luận\n\nHệ thống đáp ứng 200 người dùng đồng thời trên máy thử, với thời gian phản hồi trung bình 455 ms. "
+    "Hệ thống cũng giúp sinh viên đặt phòng nhanh hơn cách đăng ký qua văn phòng khoa.\n",
+}
+
+RECORD = """# Biên bản rà đồ án
+
+## Lần rà / Review run
+
+- Ngày / Date: 2026-11-08
+- Commit hoặc phiên bản tệp / Commit or file version: bản nháp chưa commit
+- Phạm vi / Scope: mục 5.1
+- Phiên rà / Review session: phiên mới / new session ☐ — cùng phiên với lúc viết / same session as drafting ☒
+
+## Lần rà / Review run
+
+- Ngày / Date: 2026-11-10
+- Commit: {commit}
+- Phạm vi / Scope: toàn văn / full ☒
+- Phiên rà / Review session: phiên mới / new session ☒ — cùng phiên với lúc viết / same session as drafting ☐
+
+## Cảnh báo / Warnings
+
+| # | Gate | Mức | Vị trí | Nội dung | Nguồn | Quyết định của sinh viên |
+|---|---|---|---|---|---|---|
+| 1 | Văn phong | low | `thesis/ch3-thiet-ke.md:3` | Câu dài | [Agent] | |
+"""
+
+SIGNOFF = (
+    "# Biên bản xác nhận của sinh viên\n\n"
+    "| Ngày | Phiên bản | Phạm vi | Mục đích | Người đọc và xác nhận |\n|---|---|---|---|---|\n"
+    "| 2026-11-12 | draft @ {commit} | Chương 5 (phần của Lan) | gửi thầy | Lan |\n"
+)
+
+
+def write_files(root, files):
+    for rel, content in files.items():
+        path = os.path.join(root, rel)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(content)
+
+
+def git(root, *args):
+    command = ["git", "-C", root, "-c", "user.name=Nhóm đồ án", "-c", "user.email=nhom@example.invalid", *args]
+    return subprocess.run(command, capture_output=True, text=True, check=True).stdout.strip()
+
+
+def build_group(root):
+    write_files(root, GROUP_FILES)
+    git(root, "init", "-q", "-b", "main")
+    git(root, "add", "-A")
+    git(root, "commit", "-qm", "Dữ liệu và kế hoạch")
+
+
+def build_reviewed(root):
+    """A group thesis reviewed in full at one commit, then changed and signed without a new review."""
+    write_files(root, GROUP_FILES)
+    write_files(root, REVIEWED_V1)
+    sources = ["thesis/tom-tat.md", "thesis/ch3-thiet-ke.md", "thesis/ch4-trien-khai.md", "thesis/ch5-danh-gia.md", "thesis/ch6-ket-luan.md"]
+    config = {"school": "Trường Đại học Kỹ thuật Hà Thành", "faculty": "", "type": "build", "language": "vi", "scope": "full",
+              "pages": {"min": None, "max": 60}, "sources": sources, "pdf": "", "claims": "evidence/claims.csv",
+              "ai_log": "docs/ai-log.md", "record": "docs/gate-record.md", "signoff": "docs/sign-off.md",
+              "terms": "docs/terms.md", "profile": ".thesis/profile.json"}
+    write_files(root, {
+        ".thesis/config.json": json.dumps(config, ensure_ascii=False, indent=2) + "\n",
+        ".thesis/profile.json": json.dumps({"id": "generic"}) + "\n",
+        "evidence/claims.csv": "id,value,source,verified\n"
+        "latency-200,455 ms,data/load-v2-2026-11-02.csv#avg_response_ms (200),2026-11-09\n"
+        "errors-200,2.4%,data/load-v2-2026-11-02.csv#error_rate_percent (200),2026-11-09\n"
+        "cache-ttl,120 s,config/cache-v2.yaml#ttl_seconds,2026-11-09\n",
+    })
+    git(root, "init", "-q", "-b", "main")
+    git(root, "add", "-A")
+    git(root, "commit", "-qm", "Bản đủ các chương")
+    reviewed = git(root, "rev-parse", "--short", "HEAD")
+    write_files(root, {"docs/gate-record.md": RECORD.format(commit=reviewed)})
+    git(root, "add", "-A")
+    git(root, "commit", "-qm", "Biên bản rà toàn văn")
+    git(root, "switch", "-q", "-c", "draft")
+    write_files(root, REVIEWED_V2)
+    git(root, "add", "-A")
+    git(root, "commit", "-qm", "Sửa Chương 4, 5 và Kết luận")
+    signed = git(root, "rev-parse", "--short", "HEAD")
+    write_files(root, {"docs/sign-off.md": SIGNOFF.format(commit=signed)})
+    git(root, "add", "-A")
+    git(root, "commit", "-qm", "Lan ký Chương 5")
+
+
 def build_research(root):
     for rel, content in RESEARCH_FILES.items():
         path = os.path.join(root, rel)
@@ -153,7 +308,8 @@ def build_research(root):
 if __name__ == "__main__":
     base = sys.argv[1]
     names = sys.argv[2:]
-    builder = build_research if "--research" in names else build_planned if "--planned" in names else build
+    builders = {"--research": build_research, "--planned": build_planned, "--group": build_group, "--reviewed": build_reviewed}
+    builder = next((builders[flag] for flag in builders if flag in names), build)
     for name in names:
         if name.startswith("--"):
             continue

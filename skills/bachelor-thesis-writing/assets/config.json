@@ -4,11 +4,13 @@
   "type": "build",
   "language": "vi",
   "scope": "partial",
+  "pages": {"min": null, "max": null},
   "sources": [],
   "pdf": "",
   "claims": "evidence/claims.csv",
   "ai_log": "docs/ai-log.md",
   "record": "docs/gate-record.md",
   "signoff": "docs/sign-off.md",
+  "terms": "docs/terms.md",
   "profile": ".thesis/profile.json"
 }
