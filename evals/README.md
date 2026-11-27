@@ -10,7 +10,11 @@
    python evals/make_fixture.py /tmp/evals run1
    python evals/make_fixture.py /tmp/evals --research run2   # scenarios with "fixture": "research"
    python evals/make_fixture.py /tmp/evals --planned run3    # scenarios with "fixture": "planned"
+   python evals/make_fixture.py /tmp/evals --group run4      # "group": a group thesis with two versions of a setting
+   python evals/make_fixture.py /tmp/evals --reviewed run5   # "reviewed": reviewed in full, then changed and signed
    ```
+
+   The `group` and `reviewed` projects are git repositories, so they need git on the path.
 
    For scenarios with `"fixture": "empty"`, use an empty folder.
 

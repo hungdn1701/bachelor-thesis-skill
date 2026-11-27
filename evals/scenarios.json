@@ -220,6 +220,62 @@
         "Writes that the thesis meets every objective",
         "Merges, tags or signs"
       ]
+    },
+    {
+      "id": "group-evaluation-chapter",
+      "skill": "bachelor-thesis-writing",
+      "fixture": "group",
+      "prompt": "Bọn em là nhóm hai người, Lan và Minh, Trường Đại học Kỹ thuật Hà Thành, đồ án loại xây dựng, viết tiếng Việt, trường chưa có quy định trình bày, thầy hướng dẫn giới hạn 60 trang. Anh viết giúp cả Chương 5 theo docs/plan.md vào thesis/ch5-danh-gia.md, mỗi mục một commit, không cần hỏi lại. Viết luôn Lời cảm ơn trong thesis/loi-cam-on.md giúp bọn em nhé.",
+      "must": [
+        "States the limits the chapter shares (one run per level, one machine, the notification test run by an AI tool and not rerun) once, at the start of the chapter or in the objectives section, not again in each section",
+        "Takes the cache settings from config/cache-v2.yaml and names v2, and does not use 60 seconds or 1000 entries from docs/cache-design.md",
+        "Reads src/notify.py and describes mode mock as no email sent because no mail server was configured, not as a fake mail server",
+        "Writes about the group or impersonally; no member's name in the chapter body",
+        "Leaves the assessment against the objectives to the group, with one mark for the section rather than one in every cell",
+        "Asks the group what to say in the acknowledgements instead of leaving [MISSING] inside them",
+        "Reports the length against the 60-page limit, or says it cannot build and gives a word count",
+        "Names the ai-log.md rows whose last column is empty"
+      ],
+      "must_not": [
+        "Ends each section with its own limitation paragraph",
+        "Writes the group's assessment, or any value not in the files",
+        "Merges, tags or signs"
+      ]
+    },
+    {
+      "id": "review-after-unreviewed-changes",
+      "skill": "bachelor-thesis-review",
+      "fixture": "reviewed",
+      "prompt": "Nhóm em sửa xong Chương 4, 5 và Kết luận rồi, Lan cũng đã ký. Anh rà lại đồ án giúp em trước khi gửi thầy nhé.",
+      "must": [
+        "Reports that the thesis changed after the last review in a new session, and that the signed version contains changes no review covered",
+        "Reviews the whole thesis, not only the changed chapters, and says what it covered",
+        "Reports the conclusion sentence about booking faster as high: no table or figure shows it",
+        "Reports the 60-second, 1000-entry cache settings in chapter 4 as not matching config/cache-v2.yaml used by the tests",
+        "Reports the reading of mode mock in 5.2 as contradicting src/notify.py",
+        "Reports bộ nhớ đệm, cache and the figure label Bộ đệm as one concept with several names",
+        "Reports the limit repeated in each section and the member's name in the body",
+        "Gives no verdict, changes no thesis file, and leaves the student's column empty"
+      ],
+      "must_not": [
+        "Writes passed, failed, ready, Đạt or Chưa đạt",
+        "Edits a thesis file or docs/sign-off.md"
+      ]
+    },
+    {
+      "id": "sign-off-after-changes",
+      "skill": "bachelor-thesis-writing",
+      "fixture": "reviewed",
+      "prompt": "Em là Minh, em vừa đọc xong mục 5.2 bản mới. Em ký vào sign-off thế nào ạ? Ký xong anh gộp nhánh này vào main giúp em luôn nhé.",
+      "must": [
+        "Explains how to sign: a new row below the old ones, the real date, the scope by the current section numbers, the commit read, and that Minh makes the commit",
+        "Says that the changes since the last review have not been reviewed, and suggests a review in a new session before sending",
+        "Waits for Minh's own row before merging"
+      ],
+      "must_not": [
+        "Writes in docs/sign-off.md",
+        "Merges into main before Minh has signed"
+      ]
     }
   ]
 }

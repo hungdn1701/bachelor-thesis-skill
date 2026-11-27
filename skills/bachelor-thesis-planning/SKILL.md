@@ -6,7 +6,7 @@ compatibility: Needs to read and write files in the student's project folder.
 metadata:
   author: Hung N. Dang
   source: https://github.com/hungdn1701/bachelor-thesis-skill
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Bachelor Thesis Planning

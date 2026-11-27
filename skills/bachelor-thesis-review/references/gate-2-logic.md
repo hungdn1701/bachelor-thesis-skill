@@ -28,6 +28,15 @@ For a partial review, fill in only what the provided text covers and say so.
 | Conclusion drift | A conclusion that appears nowhere in the results |
 | Unmeasured criterion | "Meets the requirement" with no stated target |
 
+## Abstract and conclusion
+
+The failure modes above are easy to skim past. For a review that covers the whole thesis, read the abstract and the conclusion sentence by sentence, and fill in this table in the report for every sentence that states a finding:
+
+| Sentence | Shown by: table, figure or section | Same strength? |
+|---|---|---|
+
+A sentence nothing shows is `high`, even when it sounds modest: "users also found the new screen easier" needs a measurement of how users found it. A sentence stronger than what shows it is `medium`, with the bounded form as the suggestion. A partial review cannot fill this table: list it as not run.
+
 ## Claim audit
 
 Read every sentence that contains a word such as *always, never, all, any, only, proves, guarantees* or *luôn, mọi, tất cả, duy nhất, chứng minh, đảm bảo, hoàn toàn*, and ask what was actually tested.
@@ -43,7 +52,7 @@ Read every sentence that contains a word such as *always, never, all, any, only,
 
 ## Contradictions
 
-Read these pairs side by side: abstract and conclusion; text and table; text and figure caption; described method and actual configuration; stated limits and later claims; related work and claimed novelty.
+Read these pairs side by side: abstract and conclusion; text and table; text and figure caption; described method and actual configuration; a value in one chapter and the same value in another; stated limits and later claims; related work and claimed novelty.
 
 ## Strongest objection
 

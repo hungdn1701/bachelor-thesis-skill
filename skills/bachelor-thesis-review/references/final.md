@@ -15,11 +15,13 @@ Report what is still open before the student submits. Report it even when time i
 | Numbers | `claims.csv` rows with an empty `verified` column, and numbers in the thesis with no row |
 | AI log | Rows with an empty last column |
 | Student's decisions | Warnings in `docs/gate-record.md` with no decision |
-| Sign-off | Whether `docs/sign-off.md` covers this version, and what changed after the last row |
+| Review coverage | The last review in a new session that covered the whole thesis, its commit, and what changed after it. Sections never reviewed. Runs marked as self-checks do not count |
+| Sign-off | Whether `docs/sign-off.md` covers this version, what changed after the last row, and whether a signed version has changes no review covered |
+| Length | Page count of the PDF against `pages` in `.thesis/config.json`, and what the limit counts |
 | PDF | Whether it exists, whether it is newer than the sources, and its format results |
 | Artifacts | Whether each one in `docs/plan.md` has a location and a fixed version |
 | Front matter | Placeholders left on the cover, and the declaration |
-| Advisor and faculty | What only they can confirm, such as the format rule and the page count |
+| Advisor and faculty | What only they can confirm, such as the format rule and the page limit |
 
 4. **Say what to do first** for the time left, starting with whatever could make a claim false.
 

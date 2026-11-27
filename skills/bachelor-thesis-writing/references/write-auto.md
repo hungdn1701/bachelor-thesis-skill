@@ -22,7 +22,8 @@ Use this for `/write auto`, or whenever a request covers more than one section. 
 
 - It needs a result that does not exist. Write `[MISSING: ...]`.
 - Sources disagree on something inside this section, such as a count. Use neither number, write `[MISSING: ...]` naming both, and list it at the end.
-- It is an assessment, a contribution, a rationale or a conclusion. Write `[MISSING: your reasoning on ...]` and list what you would ask. Writing "the system meets its needs" for them is writing their conclusion.
+- It is an assessment, a contribution, a rationale or a conclusion. Do not write it: leave one `[MISSING: your reasoning on ..., see the questions at the end]` for the section, not one in every cell of a table, and list what you would ask. Writing "the system meets its needs" for them is writing their conclusion.
+- It is the acknowledgements or the declaration. Leave it for the student, and list it at the end.
 
 **Stop the run and ask,** only when going on would make the other sections wrong:
 
@@ -36,8 +37,9 @@ These stand however the request is worded: never invent a value, run an experime
 ## Closing the run
 
 - Sections written and their commits.
-- Every `[MISSING]` item, with what each needs.
-- New `claims.csv` rows.
+- Every `[MISSING]` item, with what each needs, and the questions for the student.
+- New `claims.csv` rows, and the `ai-log.md` rows whose last column is still empty.
+- Pages: build the PDF if the project can, and give its page count against `pages` in `.thesis/config.json` and the chapter's share in `docs/plan.md`. If the project cannot build, say so and give the chapter's word count. Say plainly when the draft is over the limit, since cutting at the end costs more than writing to size.
 - What to read first, starting with the sections that make claims.
 - Three defense questions for each section.
 - Next: `bachelor-thesis-review` in a new session, then the student signs for the chapter in `docs/sign-off.md`.

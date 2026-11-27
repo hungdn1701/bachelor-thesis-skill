@@ -11,7 +11,7 @@ Use this for `/write all`, or when a student asks for the whole thesis. It only 
 
 ## Order
 
-Follow the plan, so that later chapters can rest on earlier ones: requirements and design, then implementation, then evaluation. Write the opening and the conclusion last. Their facts can come from the chapters, but objectives met, contributions and conclusions stay `[MISSING: your reasoning on ...]`.
+Follow the plan, so that later chapters can rest on earlier ones: requirements and design, then implementation, then evaluation. Write the opening and the conclusion last. Their facts can come from the chapters, and each sentence that states a finding must point to a table, figure or section that shows it; a finding no chapter measured is left out. Objectives met, contributions and conclusions stay `[MISSING: your reasoning on ...]`.
 
 ## Two ways to run
 
@@ -39,15 +39,18 @@ A stop inside a chapter leaves that chapter open, and the others go on unless th
 
 Read across the chapters. List, and do not silently fix:
 
-- The same value given differently in two places.
-- A term used in two ways.
+- The same value given differently in two places, or for two versions.
+- A term used in two ways, or one concept with two names, including in figure labels and against `docs/terms.md`.
+- The same limit repeated in several sections.
 - A cross-reference to something that does not exist.
 - A number with no `claims.csv` row.
 
 ## Closing
 
-| Chapter | Sections written | `[MISSING]` | Commits or branch | Stopped on |
-|---|---|---|---|---|
+| Chapter | Sections written | `[MISSING]` | Pages, against the plan | Commits or branch | Stopped on |
+|---|---|---|---|---|---|
+
+Give the total page count against `pages` in `.thesis/config.json`, as `references/write-auto.md` describes.
 
 Then give what to read first, starting with the chapters that make claims, and three defense questions for each chapter.
 

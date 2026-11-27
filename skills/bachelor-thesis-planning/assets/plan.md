@@ -20,6 +20,13 @@ Mark a threshold set after measuring as `post hoc`.
 | Cần gì / What is needed | Lấy từ đâu / Where from | Thuộc mục / For section |
 |---|---|---|
 
+## Độ dài / Length
+
+Giới hạn / Limit: tối thiểu / minimum —, tối đa / maximum — trang / pages (nguồn / source: —)
+
+| Chương / Chapter | Số trang dự kiến / Planned pages |
+|---|---|
+
 ## Thứ tự và mốc / Order and milestones
 
 | Mốc / Milestone | Ngày / Date | Gặp giảng viên / Advisor meeting |
